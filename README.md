@@ -4,9 +4,9 @@
 
   # Glance (MVP)
 
-  **Understand any complex paragraph before your coffee gets cold.**
+  **Understand any complex paragraph, weird code snippet, or cryptic error before your coffee gets cold.**
 
-  *Highlight obscure jargon, press `Cmd+Shift+S`, and get an instant ELI5 explanation right from your system tray.*
+  *Highlight obscure jargon, AI-generated code, or stack trace dumps, press `Cmd+Shift+S`, and get an instant ELI5 breakdown right from your system tray.*
 
   [![Tauri](https://img.shields.io/badge/Tauri-v2-blue?logo=tauri)](https://tauri.app)
   [![Svelte](https://img.shields.io/badge/Svelte-v5-ff3e00?logo=svelte)](https://svelte.dev)
@@ -30,10 +30,10 @@ No context switching. No opening ChatGPT tabs. No $20/month subscription traps.
 
 ### What Glance is (and isn't)
 
-- **What it is**: A 1-second contextual brain. Highlight that 1 weird sentence, dense math formula, or cryptic error log, hit `Cmd+Shift+S`, get a crisp ELI5 answer, and get back to work.
-- **What it isn't**: A 20-page essay generator, a multi-turn chat suite, or a heavy research agent.
+- **What it is**: A 1-second contextual brain. Highlight 1 weird sentence, a dense math formula, a line of AI-generated code you don't trust, or a cryptic stack trace, hit `Cmd+Shift+S`, get a crisp ELI5 answer + fix, and get back to work.
+- **What it isn't**: A 20-page essay generator, a bloated multi-turn chat assistant, or a heavy research agent.
 
-> *If you want a 10-paragraph thesis, open ChatGPT. If you want to understand 1 confusing paragraph in 2 seconds without ruining your focus, use Glance.*
+> *If you want a 10-paragraph thesis, open ChatGPT. If you want to know why your Rust compiler is screaming at line 42 without leaving your terminal, use Glance.*
 
 ---
 
@@ -49,7 +49,7 @@ No context switching. No opening ChatGPT tabs. No $20/month subscription traps.
 ## How to Use
 
 ### 1. Clipboard Mode (Text)
-1. **Highlight Text**: Select any confusing paragraph, whitepaper math, jargon, or error traceback in any app (Browser, IDE, PDF, Notion, Slack).
+1. **Highlight Text**: Select any confusing paragraph, whitepaper math, jargon, AI-generated code, or error traceback in any app (Browser, IDE, PDF, Notion, Slack, Terminal).
 2. **Copy (`Cmd+C`)**: Copy the highlighted text to your clipboard.
 3. **Trigger Glance (`Cmd+Shift+S`)**: Press `Cmd+Shift+S` (or `Ctrl+Shift+S` on Windows/Linux).
 4. **Read & Copy**: A sleek popup opens directly from your tray icon (menu bar on macOS / taskbar on Windows) with a clear, zero-fluff explanation.
@@ -65,12 +65,13 @@ No context switching. No opening ChatGPT tabs. No $20/month subscription traps.
 
 ## Use Cases
 
-Why waste mental bandwidth decoding dense text? **Glance** handles:
+Why waste mental bandwidth decoding dense text or cryptic code? **Glance** handles:
 
+- **Code & Syntax Breakdown**: Highlight obscure Rust macros, minified JS, regex patterns, or weird AI-generated code snippets to understand what they actually do.
+- **Error Logs & Stack Traces**: Highlight cryptographic error dumps, C++ segfaults, or npm build panics for an instant root-cause & fix.
 - **Academic & Whitepapers**: Translate complex formulas, dense abstracts, or IEEE math into plain English.
-- **Error Logs & Stack Traces**: Highlight cryptographic error dumps or obscure compiler failures to get an immediate fix suggestion.
 - **Legal Fine Print & Terms**: Decode sneaky clauses in Privacy Policies or SaaS contracts without reading 15 pages.
-- **Foreign Idioms & Jargon**: Capture screenshots of untranslatable web pages or niche technical abbreviations.
+- **Foreign Idioms & Jargon**: Capture untranslatable web pages or niche technical abbreviations.
 - **Financial & Business Reports**: Demystify wall-street jargon, balance sheets, and tax policy blocks in a single glance.
 
 ---
