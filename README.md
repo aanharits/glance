@@ -2,25 +2,25 @@
 
   <img src="src-tauri/icons/icon.png" alt="Glance Logo" width="110" height="110" />
 
-  # Glance (MVP)
+# Glance (MVP)
 
-  **Understand any complex paragraph, weird code snippet, or cryptic error before your coffee gets cold.**
+**Understand any complex paragraph, weird code snippet, or error message before your coffee gets cold.**
 
-  *Highlight obscure jargon, AI-generated code, or stack trace dumps, press `Cmd+Shift+S`, and get an instant ELI5 breakdown right from your system tray.*
+_Highlight obscure jargon, AI code, or error logs, press `Cmd+Shift+S`, and get an instant ELI5 explanation right from your system tray._
 
-  [![Tauri](https://img.shields.io/badge/Tauri-v2-blue?logo=tauri)](https://tauri.app)
-  [![Svelte](https://img.shields.io/badge/Svelte-v5-ff3e00?logo=svelte)](https://svelte.dev)
-  [![Rust](https://img.shields.io/badge/Rust-Backend-000000?logo=rust)](https://www.rust-lang.org)
-  [![Markdown](https://img.shields.io/badge/Markdown-marked-000000)](https://marked.js.org)
-  [![Math](https://img.shields.io/badge/LaTeX-KaTeX-00b894)](https://katex.org)
-  [![BYOK](https://img.shields.io/badge/API-BYOK-green)](#setup-your-api-keys-byok)
-  [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Tauri](https://img.shields.io/badge/Tauri-v2-blue?logo=tauri)](https://tauri.app)
+[![Svelte](https://img.shields.io/badge/Svelte-v5-ff3e00?logo=svelte)](https://svelte.dev)
+[![Rust](https://img.shields.io/badge/Rust-Backend-000000?logo=rust)](https://www.rust-lang.org)
+[![Markdown](https://img.shields.io/badge/Markdown-marked-000000)](https://marked.js.org)
+[![Math](https://img.shields.io/badge/LaTeX-KaTeX-00b894)](https://katex.org)
+[![BYOK](https://img.shields.io/badge/API-BYOK-green)](#setup-your-api-keys-byok)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 </div>
 
 ---
 
-### *"The best code explanation is the one you never had to leave your IDE or browser to read."*
+### _"The best code explanation is the one you never had to leave your IDE or browser to read."_
 
 **Glance** is a hyper-lightweight native desktop tool built with **Tauri + Rust + Svelte**. It sits silently in your system tray until you hit `Cmd+Shift+S` (or `Ctrl+Shift+S`). It instantly reads your highlighted text or captured screenshot area, sends it to ultra-fast LLMs (Groq / Gemini Vision), and pops up a crisp, clutter-free explanation anchored neatly under your system tray icon (top-right menu bar on macOS, bottom-right taskbar on Windows).
 
@@ -30,10 +30,10 @@ No context switching. No opening ChatGPT tabs. No $20/month subscription traps.
 
 ### What Glance is (and isn't)
 
-- **What it is**: A 1-second contextual brain. Highlight 1 weird sentence, a dense math formula, a line of AI-generated code you don't trust, or a cryptic stack trace, hit `Cmd+Shift+S`, get a crisp ELI5 answer + fix, and get back to work.
-- **What it isn't**: A 20-page essay generator, a bloated multi-turn chat assistant, or a heavy research agent.
+- **What it is**: A 1-second contextual brain. Highlight 1 confusing sentence, a math formula, AI-generated code, or an error log, hit `Cmd+Shift+S`, get a clear ELI5 answer and fix, and keep working.
+- **What it isn't**: A 20-page essay generator, a multi-turn chatbot, or a heavy research suite.
 
-> *If you want a 10-paragraph thesis, open ChatGPT. If you want to know why your Rust compiler is screaming at line 42 without leaving your terminal, use Glance.*
+> _If you want a 10-paragraph thesis, open ChatGPT. If you want to understand 1 confusing paragraph or error in 2 seconds without breaking your flow, use Glance._
 
 ---
 
@@ -49,6 +49,7 @@ No context switching. No opening ChatGPT tabs. No $20/month subscription traps.
 ## How to Use
 
 ### 1. Clipboard Mode (Text)
+
 1. **Highlight Text**: Select any confusing paragraph, whitepaper math, jargon, AI-generated code, or error traceback in any app (Browser, IDE, PDF, Notion, Slack, Terminal).
 2. **Copy (`Cmd+C`)**: Copy the highlighted text to your clipboard.
 3. **Trigger Glance (`Cmd+Shift+S`)**: Press `Cmd+Shift+S` (or `Ctrl+Shift+S` on Windows/Linux).
@@ -56,7 +57,8 @@ No context switching. No opening ChatGPT tabs. No $20/month subscription traps.
    - Press **`Cmd+C`** inside the popup to copy the summary.
    - Press **`Esc`** (or click away) to dismiss.
 
-### 2. Vision Mode (Drag & Select Screenshot) — *In Development*
+### 2. Vision Mode (Drag & Select Screenshot) — _In Development_
+
 1. Press **`Cmd+Shift+S`**.
 2. **Drag & Select**: Drag a box around any chart, diagram, code block, or untranslatable image on your screen.
 3. **Instant Analysis**: Gemini Vision analyzes the selected region and gives you an immediate breakdown.
@@ -65,13 +67,13 @@ No context switching. No opening ChatGPT tabs. No $20/month subscription traps.
 
 ## Use Cases
 
-Why waste mental bandwidth decoding dense text or cryptic code? **Glance** handles:
+Why waste mental bandwidth decoding dense text or complex code? **Glance** handles:
 
-- **Code & Syntax Breakdown**: Highlight obscure Rust macros, minified JS, regex patterns, or weird AI-generated code snippets to understand what they actually do.
-- **Error Logs & Stack Traces**: Highlight cryptographic error dumps, C++ segfaults, or npm build panics for an instant root-cause & fix.
+- **Code & Syntax Breakdown**: Highlight complex functions, minified code, regex patterns, or AI snippets to understand what they actually do.
+- **Error Logs & Stack Traces**: Highlight compiler errors, build failures, or stack traces for an instant root-cause explanation and fix.
 - **Academic & Whitepapers**: Translate complex formulas, dense abstracts, or IEEE math into plain English.
 - **Legal Fine Print & Terms**: Decode sneaky clauses in Privacy Policies or SaaS contracts without reading 15 pages.
-- **Foreign Idioms & Jargon**: Capture untranslatable web pages or niche technical abbreviations.
+- **Foreign Languages & Jargon**: Understand untranslatable web pages or technical abbreviations.
 - **Financial & Business Reports**: Demystify wall-street jargon, balance sheets, and tax policy blocks in a single glance.
 
 ---
@@ -84,7 +86,7 @@ Why waste mental bandwidth decoding dense text or cryptic code? **Glance** handl
 - **Bring Your Own Key (BYOK)**: Connect your free Groq or Gemini API keys. Pay `$0.0001` per month instead of `$20` SaaS fees.
 - **Dual Mode (Text & Vision)**:
   - **Clipboard Mode**: Instant sub-second text analysis powered by Groq (Llama 3 / Mixtral).
-  - **Vision Mode** *(In Development)*: Drag-select region screenshots analyzed by Gemini 1.5 Flash Vision.
+  - **Vision Mode** _(In Development)_: Drag-select region screenshots analyzed by Gemini 1.5 Flash Vision.
 - **Keyboard-First Design**: Press `Esc` to close, `Cmd+C` to copy the explanation.
 
 ---
