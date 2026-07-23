@@ -2,23 +2,25 @@
 
   <img src="src-tauri/icons/icon.png" alt="Glance Logo" width="110" height="110" />
 
-# Glance (MVP)
+  # Glance (MVP)
 
-**Understand any complex paragraph before your coffee gets cold.**
+  **Understand any complex paragraph before your coffee gets cold.**
 
-_Highlight obscure jargon, press `Cmd+Shift+S`, and get an instant ELI5 explanation right from your system tray._
+  *Highlight obscure jargon, press `Cmd+Shift+S`, and get an instant ELI5 explanation right from your system tray.*
 
-[![Tauri](https://img.shields.io/badge/Tauri-v2-blue?logo=tauri)](https://tauri.app)
-[![Svelte](https://img.shields.io/badge/Svelte-v5-ff3e00?logo=svelte)](https://svelte.dev)
-[![Rust](https://img.shields.io/badge/Rust-Backend-000000?logo=rust)](https://www.rust-lang.org)
-[![BYOK](https://img.shields.io/badge/API-BYOK-green)](#setup-your-api-keys-byok)
-[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+  [![Tauri](https://img.shields.io/badge/Tauri-v2-blue?logo=tauri)](https://tauri.app)
+  [![Svelte](https://img.shields.io/badge/Svelte-v5-ff3e00?logo=svelte)](https://svelte.dev)
+  [![Rust](https://img.shields.io/badge/Rust-Backend-000000?logo=rust)](https://www.rust-lang.org)
+  [![Markdown](https://img.shields.io/badge/Markdown-marked-000000)](https://marked.js.org)
+  [![Math](https://img.shields.io/badge/LaTeX-KaTeX-00b894)](https://katex.org)
+  [![BYOK](https://img.shields.io/badge/API-BYOK-green)](#setup-your-api-keys-byok)
+  [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 </div>
 
 ---
 
-### _"The best code explanation is the one you never had to leave your IDE or browser to read."_
+### *"The best code explanation is the one you never had to leave your IDE or browser to read."*
 
 **Glance** is a hyper-lightweight native desktop tool built with **Tauri + Rust + Svelte**. It sits silently in your system tray until you hit `Cmd+Shift+S` (or `Ctrl+Shift+S`). It instantly reads your highlighted text or captured screenshot area, sends it to ultra-fast LLMs (Groq / Gemini Vision), and pops up a crisp, clutter-free explanation anchored neatly under your system tray icon (top-right menu bar on macOS, bottom-right taskbar on Windows).
 
@@ -38,7 +40,6 @@ No context switching. No opening ChatGPT tabs. No $20/month subscription traps.
 ## How to Use
 
 ### 1. Clipboard Mode (Text)
-
 1. **Highlight Text**: Select any confusing paragraph, whitepaper math, jargon, or error traceback in any app (Browser, IDE, PDF, Notion, Slack).
 2. **Copy (`Cmd+C`)**: Copy the highlighted text to your clipboard.
 3. **Trigger Glance (`Cmd+Shift+S`)**: Press `Cmd+Shift+S` (or `Ctrl+Shift+S` on Windows/Linux).
@@ -46,8 +47,7 @@ No context switching. No opening ChatGPT tabs. No $20/month subscription traps.
    - Press **`Cmd+C`** inside the popup to copy the summary.
    - Press **`Esc`** (or click away) to dismiss.
 
-### 2. Vision Mode (Drag & Select Screenshot) — _In Development_
-
+### 2. Vision Mode (Drag & Select Screenshot) — *In Development*
 1. Press **`Cmd+Shift+S`**.
 2. **Drag & Select**: Drag a box around any chart, diagram, code block, or untranslatable image on your screen.
 3. **Instant Analysis**: Gemini Vision analyzes the selected region and gives you an immediate breakdown.
@@ -74,7 +74,7 @@ Why waste mental bandwidth decoding dense text? **Glance** handles:
 - **Bring Your Own Key (BYOK)**: Connect your free Groq or Gemini API keys. Pay `$0.0001` per month instead of `$20` SaaS fees.
 - **Dual Mode (Text & Vision)**:
   - **Clipboard Mode**: Instant sub-second text analysis powered by Groq (Llama 3 / Mixtral).
-  - **Vision Mode** _(In Development)_: Drag-select region screenshots analyzed by Gemini 1.5 Flash Vision.
+  - **Vision Mode** *(In Development)*: Drag-select region screenshots analyzed by Gemini 1.5 Flash Vision.
 - **Keyboard-First Design**: Press `Esc` to close, `Cmd+C` to copy the explanation.
 
 ---
@@ -124,12 +124,13 @@ Glance supports free-tier API keys:
               └── Lightweight Popup Lifecycle
                           │
                           ▼
-            [ Minimalist Svelte 5 UI ] ──( Fetch API )──► Groq / Gemini
+             [ Minimalist Svelte 5 UI ] ──( Fetch API )──► Groq / Gemini
 ```
 
-- **Frontend**: Svelte 5 + Vite (Vanilla CSS, custom design tokens, `marked` Markdown parser, `KaTeX` math engine).
+- **Frontend**: Svelte 5 + Vite (Vanilla CSS, custom design tokens, dark/light auto-theme).
+- **Markdown & Math**: `marked` (GitHub-Flavored Markdown parser) + `KaTeX` (LaTeX math rendering engine).
 - **Backend**: Rust + Tauri v2 (macOS Private API enabled for native blur/vibrancy effects).
-- **AI Models**: Groq (Llama 3 70B / 8B) & Gemini 1.5 Flash Vision.
+- **AI Models**: Groq (Llama 3.1 8B / 70B) & Gemini 1.5 Flash Vision.
 
 ---
 
