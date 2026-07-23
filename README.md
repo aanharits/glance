@@ -28,6 +28,15 @@ No context switching. No opening ChatGPT tabs. No $20/month subscription traps.
 
 ---
 
+### What Glance is (and isn't)
+
+- **What it is**: A 1-second contextual brain. Highlight that 1 weird sentence, dense math formula, or cryptic error log, hit `Cmd+Shift+S`, get a crisp ELI5 answer, and get back to work.
+- **What it isn't**: A 20-page essay generator, a multi-turn chat suite, or a heavy research agent.
+
+> *If you want a 10-paragraph thesis, open ChatGPT. If you want to understand 1 confusing paragraph in 2 seconds without ruining your focus, use Glance.*
+
+---
+
 ## Demo
 
 <div align="center">
