@@ -58,6 +58,11 @@ pub fn run() {
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .plugin(tauri_plugin_store::Builder::new().build())
+        .on_window_event(|window, event| {
+            if let tauri::WindowEvent::Focused(false) = event {
+                let _ = window.hide();
+            }
+        })
         .setup(|app| {
             // Hide dock icon — app runs exclusively as an Accessory item in tray
             #[cfg(target_os = "macos")]
