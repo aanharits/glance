@@ -1,0 +1,18 @@
+{
+  "identifier": "default",
+  "description": "Default permissions for Glance popup window",
+  "windows": ["popup"],
+  "permissions": [
+    "core:default",
+    "core:window:allow-hide",
+    "core:window:allow-show",
+    "core:window:allow-set-size",
+    "core:window:allow-set-focus",
+    "core:window:allow-start-dragging",
+    "clipboard-manager:allow-read-text",
+    "global-shortcut:allow-register",
+    "global-shortcut:allow-is-registered",
+    "autostart:default",
+    "store:default"
+  ]
+}
