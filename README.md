@@ -2,7 +2,7 @@
 
   <img src="src-tauri/icons/icon.png" alt="Glance Logo" width="110" height="110" />
 
-# glance (MVP)
+# Glance (MVP)
 
 **Understand any complex paragraph before your coffee gets cold.**
 
@@ -70,6 +70,7 @@ Why waste mental bandwidth decoding dense text? **Glance** handles:
 
 - **Near-Zero Footprint**: Native Rust app using less than 31 MB RAM (core process). The webview is destroyed when closed—zero background memory drain.
 - **Tray-Anchored Popup**: Appears seamlessly under your system tray icon (top-right menu bar on macOS, bottom-right taskbar on Windows). Auto-hides on focus loss.
+- **Rich Markdown & LaTeX Rendering**: Full support for bold/italic typography, inline code blocks, formatted lists, and LaTeX math formulas (`$...$` and `$$...$$` rendered via KaTeX).
 - **Bring Your Own Key (BYOK)**: Connect your free Groq or Gemini API keys. Pay `$0.0001` per month instead of `$20` SaaS fees.
 - **Dual Mode (Text & Vision)**:
   - **Clipboard Mode**: Instant sub-second text analysis powered by Groq (Llama 3 / Mixtral).
@@ -126,7 +127,7 @@ Glance supports free-tier API keys:
             [ Minimalist Svelte 5 UI ] ──( Fetch API )──► Groq / Gemini
 ```
 
-- **Frontend**: Svelte + Vite (Vanilla CSS, custom design tokens, dark/light auto-theme).
+- **Frontend**: Svelte 5 + Vite (Vanilla CSS, custom design tokens, `marked` Markdown parser, `KaTeX` math engine).
 - **Backend**: Rust + Tauri v2 (macOS Private API enabled for native blur/vibrancy effects).
 - **AI Models**: Groq (Llama 3 70B / 8B) & Gemini 1.5 Flash Vision.
 
