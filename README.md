@@ -68,7 +68,7 @@ Why waste mental bandwidth decoding dense text? **Glance** handles:
 
 ## Features
 
-- **Near-Zero Footprint**: Native Rust app using ~30MB RAM. The webview is destroyed when closed—zero background memory drain.
+- **Near-Zero Footprint**: Native Rust app using less than 31 MB RAM (core process). The webview is destroyed when closed—zero background memory drain.
 - **Tray-Anchored Popup**: Appears seamlessly under your system tray icon (top-right menu bar on macOS, bottom-right taskbar on Windows). Auto-hides on focus loss.
 - **Bring Your Own Key (BYOK)**: Connect your free Groq or Gemini API keys. Pay `$0.0001` per month instead of `$20` SaaS fees.
 - **Dual Mode (Text & Vision)**:
