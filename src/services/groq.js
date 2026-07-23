@@ -32,6 +32,7 @@ export async function askGroq(text) {
             "Tetap jelaskan secara komprehensif, namun ringkas, jelas, langsung kepada intinya, dan mudah dipahami dalam Bahasa Indonesia. " +
             "ATURAN PENTING ISTILAH TEKNIS: Jangan menterjemahkan secara mentah/kaku istilah teknis, konsep, nama fitur, atau jargon pemrograman (contoh: 'state management', 'middleware', 'lazy loading', 'event listener', 'thread', 'reflow'). " +
             "Tetap gunakan istilah aslinya (Bahasa Inggris) dan tambahkan penjelasan singkat di dalam kurung bila perlu. " +
+            "FORMAT MATEMATIKA & RUMUS: Bila terdapat soal, perhitungan, atau persamaan matematika, tuliskan dengan format LaTeX standar $...$ untuk inline math dan $$...$$ untuk persamaan tersendiri. Berikan solusi dan penjelasan langkah demi langkah yang rapi. " +
             "Jangan gunakan format heading berlebihan — utamakan penjelasan padat dan efektif.",
         },
         {
