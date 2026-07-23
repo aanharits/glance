@@ -1,5 +1,7 @@
 <script>
   import { marked } from "marked";
+  import markedKatex from "marked-katex-extension";
+  import "katex/dist/katex.min.css";
 
   /** @type {{
    *   status: string,
@@ -12,6 +14,13 @@
     gfm: true,
     breaks: true,
   });
+
+  marked.use(
+    markedKatex({
+      throwOnError: false,
+      nonStandard: true,
+    })
+  );
 
   let parsedResult = $derived(
     status === "result" && resultText ? marked.parse(resultText) : ""
@@ -117,6 +126,19 @@
   .result-html :global(a) {
     color: var(--accent, #a855f7);
     text-decoration: underline;
+  }
+
+  /* KaTeX Math Styling */
+  .result-html :global(.katex) {
+    font-size: 1.05em;
+    color: var(--text-primary, #ffffff);
+  }
+
+  .result-html :global(.katex-display) {
+    margin: 10px 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 6px 0;
   }
 
   .error-text {
