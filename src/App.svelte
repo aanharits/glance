@@ -2,11 +2,11 @@
   import "./app.css";
   import { onMount, onDestroy, tick } from "svelte";
   import { listen } from "@tauri-apps/api/event";
-  import { getClipboardText } from "./clipboard.js";
-  import { askGroq } from "./groq.js";
-  import { resizeToContent, closePopup, playPopIn } from "./window.js";
-  import { setupWindowDrag } from "./drag.js";
-  import { saveTheme, loadTheme } from "./theme.js";
+  import { getClipboardText } from "./services/clipboard.js";
+  import { askGroq } from "./services/groq.js";
+  import { resizeToContent, closePopup, playPopIn } from "./services/window.js";
+  import { setupWindowDrag } from "./services/drag.js";
+  import { saveTheme, loadTheme } from "./services/theme.js";
 
   // UI Components
   import PopupHeader from "./components/PopupHeader.svelte";

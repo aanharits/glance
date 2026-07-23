@@ -1,5 +1,5 @@
 <script>
-  import { PRESET_THEMES } from "../theme.js";
+  import { PRESET_THEMES } from "../services/theme.js";
 
   /** @type {{
    *   currentThemeId: string,
