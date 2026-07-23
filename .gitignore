@@ -1,6 +1,9 @@
 node_modules/
 dist/
 src-tauri/target/
+.DS_Store
+*.DS_Store
+docs/
 
 # Environment variables (API keys)
 .env
