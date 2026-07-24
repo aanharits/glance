@@ -11,6 +11,12 @@ fn trigger_snap(app: &tauri::AppHandle) {
         return;
     };
 
+    // If window is already visible (focused or unfocused), toggle it closed
+    if window.is_visible().unwrap_or(false) {
+        let _ = window.emit("snap:close", ());
+        return;
+    }
+
     if let Ok(Some(monitor)) = window.primary_monitor() {
         let monitor_size = monitor.size();
         let scale_factor = monitor.scale_factor();

@@ -53,6 +53,8 @@
   /** @type {(() => void) | null} */
   let unlistenSnap = null;
   /** @type {(() => void) | null} */
+  let unlistenClose = null;
+  /** @type {(() => void) | null} */
   let unlistenTheme = null;
   /** @type {any} */
   let clipboardInterval = null;
@@ -65,6 +67,9 @@
     historyItems = await getHistory();
 
     unlistenSnap = await listen("snap:triggered", handleSnap);
+    unlistenClose = await listen("snap:close", () => {
+      if (isWindowVisible) handleClose();
+    });
     unlistenTheme = await listen(
       "theme:changed",
       (e) => e.payload && selectPresetTheme(e.payload),
@@ -83,6 +88,7 @@
 
   onDestroy(() => {
     if (unlistenSnap) unlistenSnap();
+    if (unlistenClose) unlistenClose();
     if (unlistenTheme) unlistenTheme();
     if (clipboardInterval) clearInterval(clipboardInterval);
   });
