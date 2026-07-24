@@ -4,8 +4,8 @@ import { getCurrentWindow, LogicalSize } from "@tauri-apps/api/window";
 
 const MAX_HEIGHT = 600;
 const MIN_HEIGHT = 100;
-const WINDOW_WIDTH = 420;
-const PADDING = 16; // padding <main> (8px * 2)
+const WINDOW_WIDTH = 590;
+const PADDING = 16; // padding <main> (8px `* 2)
 
 /**
  * Dynamically resizes Tauri window based on DOM content height.
@@ -20,6 +20,20 @@ export async function resizeToContent(container) {
   try {
     const win = getCurrentWindow();
     await win.setSize(new LogicalSize(WINDOW_WIDTH, contentHeight));
+  } catch (err) {
+    console.warn("Failed to resize window:", err);
+  }
+}
+
+/**
+ * Resizes Tauri window to an explicit pixel height (for pre-sizing before animation).
+ * @param {number} height - Target logical pixel height
+ */
+export async function resizeToHeight(height) {
+  const clamped = Math.max(MIN_HEIGHT, Math.min(height, MAX_HEIGHT));
+  try {
+    const win = getCurrentWindow();
+    await win.setSize(new LogicalSize(WINDOW_WIDTH, clamped));
   } catch (err) {
     console.warn("Failed to resize window:", err);
   }
