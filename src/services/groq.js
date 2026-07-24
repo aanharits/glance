@@ -31,13 +31,13 @@ export async function askGroq(text, history = [], mode = "explain") {
 
   const systemPromptSummary =
     "Kamu adalah Glance Summary Mode, sebuah alat merangkum cepat (quick summarizer tool) yang berjalan di desktop. " +
-    "Tugas utamamu adalah merangkum teks panjang, artikel bertele-tele, dokumen, atau tulisan yang di-copy pengguna menjadi ringkasan TL;DR super padat, tajam, dan langsung pada inti informasi pentingnya.\n\n" +
+    "Tugas utamamu adalah merangkum teks panjang, artikel bertele-tele, dokumen, atau tulisan yang di-copy pengguna menjadi ringkasan super padat, tajam, dan langsung pada inti informasi pentingnya.\n\n" +
     "ATURAN MERANGKUM:\n" +
     "1. STRUKTUR RANGKUMAN:\n" +
-    "   - Baris Pertama: **TL;DR**: 1 kalimat kesimpulan utama yang paling padat dan mencakup inti pesan.\n" +
+    "   - Baris Pertama: 1 kalimat kesimpulan utama yang paling padat dan mencakup inti pesan.\n" +
     "   - Poin-Poin Utama: 3 hingga 5 bullet points ringkas yang merangkum poin-poin paling penting (Key Takeaways).\n" +
-    "2. DILARANG BERTELE-TELE: Hapus seluruh kata-kata pengisi, contoh berlebihan, atau basa-basi. Fokus 100% pada fakta/informasi inti.\n" +
-    "3. TANPA BASA-BASI: Langsung tulis **TL;DR**, tanpa kalimat pembuka 'Berikut rangkumannya:' atau penutup.\n" +
+    "2. DILARANG MEMASUKKAN LABEL 'TL;DR:': DILARANG KERAS menulis kata atau label 'TL;DR:' di awal jawaban. Langsung tulis kalimat kesimpulan utamanya.\n" +
+    "3. DILARANG BERTELE-TELE: Hapus seluruh kata-kata pengisi, contoh berlebihan, atau basa-basi. Fokus 100% pada fakta/informasi inti tanpa salam/pembuka/penutup.\n" +
     "4. ISTILAH TEKNIS: Pertahankan istilah penting atau kata kunci utama dalam bahasa aslinya.\n" +
     "5. FORMAT: Gunakan formatting markdown tebal (bold) untuk kata kunci utama di setiap bullet point agar mudah dipindai (scannable).";
 
@@ -81,5 +81,11 @@ export async function askGroq(text, history = [], mode = "explain") {
     throw new Error("Groq API returned an empty response.");
   }
 
-  return message.trim();
+  let cleanMessage = message.trim();
+  if (mode === "summary") {
+    // Strip any accidental 'TL;DR:' or '**TL;DR:**' prefix if returned by LLM
+    cleanMessage = cleanMessage.replace(/^(\*\*|\*)?TL;?DR:?(\*\*|\*)?\s*/i, "");
+  }
+
+  return cleanMessage.trim();
 }

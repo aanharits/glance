@@ -23,11 +23,30 @@ fn get_mac_pasteboard_change_count() -> i64 {
     }
 }
 
+#[cfg(target_os = "macos")]
+fn setup_mac_window_spaces_behavior(window: &tauri::WebviewWindow) {
+    use objc::{msg_send, sel, sel_impl};
+    if let Ok(ns_win_ptr) = window.ns_window() {
+        let ns_win = ns_win_ptr as *mut objc::runtime::Object;
+        if !ns_win.is_null() {
+            unsafe {
+                // NSWindowCollectionBehaviorCanJoinAllSpaces (1) + NSWindowCollectionBehaviorFullScreenAuxiliary (256)
+                // Ensures Glance popup stays visible across ALL macOS Spaces & Fullscreen desktops
+                let behavior: u64 = 1 | 256;
+                let _: () = msg_send![ns_win, setCollectionBehavior: behavior];
+            }
+        }
+    }
+}
+
 // Main trigger: positions popup window anchored directly at Glance tray icon area.
 fn trigger_snap(app: &tauri::AppHandle) {
     let Some(window) = app.get_webview_window("popup") else {
         return;
     };
+
+    #[cfg(target_os = "macos")]
+    setup_mac_window_spaces_behavior(&window);
 
     if let Ok(Some(monitor)) = window.primary_monitor() {
         let monitor_size = monitor.size();
@@ -80,6 +99,11 @@ pub fn run() {
             // Hide dock icon — app runs exclusively as an Accessory item in tray
             #[cfg(target_os = "macos")]
             app.set_activation_policy(tauri::ActivationPolicy::Accessory);
+
+            #[cfg(target_os = "macos")]
+            if let Some(window) = app.get_webview_window("popup") {
+                setup_mac_window_spaces_behavior(&window);
+            }
 
             // Native OS changeCount pasteboard listener thread (100ms)
             // Triggers instantly on ANY system copy action (Cmd+C), 100% independent of Webkit window focus

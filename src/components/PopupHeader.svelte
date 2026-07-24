@@ -130,8 +130,8 @@
               <line x1="12" y1="8" x2="12.01" y2="8" />
             </svg>
             <div class="mode-info">
-              <span class="mode-title">Switch to Explain</span>
-              <span class="mode-desc">Detailed ELI5 breakdown</span>
+              <span class="mode-title">Explain</span>
+              <span class="mode-desc">Weird math, code, paragraph</span>
             </div>
           </button>
         {:else}
@@ -154,8 +154,8 @@
               <line x1="17" y1="18" x2="3" y2="18" />
             </svg>
             <div class="mode-info">
-              <span class="mode-title">Switch to Summary</span>
-              <span class="mode-desc">TL;DR bullet points</span>
+              <span class="mode-title">Summary</span>
+              <span class="mode-desc">Long paragraph, docs, articles</span>
             </div>
           </button>
         {/if}
@@ -358,18 +358,17 @@
     position: absolute;
     top: calc(100% + 6px);
     left: 0;
-    width: 180px;
-    background: var(--surface);
+    width: 200px;
+    background: var(--bg-solid, #16151a);
     border: 1px solid var(--border);
     border-radius: 8px;
     padding: 4px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
-    backdrop-filter: blur(16px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
     z-index: 100;
     display: flex;
     flex-direction: column;
     gap: 2px;
-    animation: menuFadeIn 150ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: menuFadeIn 140ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
 
   @keyframes menuFadeIn {

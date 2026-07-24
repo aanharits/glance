@@ -3,7 +3,11 @@
   import { onMount, onDestroy, tick } from "svelte";
   import { slide } from "svelte/transition";
   import { listen } from "@tauri-apps/api/event";
-  import { checkNewCopy, syncClipboardBaseline } from "./services/clipboard.js";
+  import {
+    checkNewCopy,
+    syncClipboardBaseline,
+    setLastProcessedText,
+  } from "./services/clipboard.js";
   import { askGroq } from "./services/groq.js";
   import {
     resizeToContent,
@@ -52,8 +56,8 @@
   let unlistenSnap = null;
   /** @type {(() => void) | null} */
   let unlistenTheme = null;
-  /** @type {any} */
-  let clipboardInterval = null;
+  /** @type {(() => void) | null} */
+  let unlistenClip = null;
 
   onMount(async () => {
     const loaded = await loadTheme();
@@ -68,21 +72,26 @@
       (e) => e.payload && selectPresetTheme(e.payload),
     );
 
-    // Monitor clipboard for new copy events ONLY when Glance window is actively visible
-    clipboardInterval = setInterval(async () => {
+    // Native OS clipboard listener emitted by Rust background thread
+    // 100% event-driven: zero CPU & RAM overhead from JS setInterval polling
+    unlistenClip = await listen("clipboard:changed", async (e) => {
       if (!isWindowVisible) return;
 
-      const newText = await checkNewCopy();
-      if (newText) {
-        doCapture(newText);
+      const text = e.payload;
+      if (text && typeof text === "string" && status !== "loading") {
+        const trimmed = text.trim();
+        if (trimmed && trimmed.length > 0) {
+          setLastProcessedText(trimmed);
+          await doCapture(trimmed);
+        }
       }
-    }, 200);
+    });
   });
 
   onDestroy(() => {
     if (unlistenSnap) unlistenSnap();
     if (unlistenTheme) unlistenTheme();
-    if (clipboardInterval) clearInterval(clipboardInterval);
+    if (unlistenClip) unlistenClip();
   });
 
   // Attach native window drag handle
