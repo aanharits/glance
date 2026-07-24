@@ -3,7 +3,12 @@
   import { onMount, onDestroy, tick } from "svelte";
   import { slide } from "svelte/transition";
   import { listen } from "@tauri-apps/api/event";
-  import { syncClipboardBaseline, checkNewCopy } from "./services/clipboard.js";
+  import {
+    checkNewCopy,
+    getClipboardText,
+    getLastProcessedText,
+    setLastProcessedText,
+  } from "./services/clipboard.js";
   import { askGroq } from "./services/groq.js";
   import {
     resizeToContent,
@@ -101,11 +106,18 @@
 
   async function handleSnap() {
     isWindowVisible = true;
-    // Sync current clipboard as baseline so old text copied while closed is IGNORED
-    await syncClipboardBaseline();
-
     await tick();
     if (cardEl) playPopIn(cardEl);
+
+    // Instantly check and process current clipboard text when shortcut/tray is triggered
+    const currentClip = await getClipboardText();
+    if (currentClip) {
+      const last = getLastProcessedText();
+      if (currentClip !== last || status === "idle") {
+        setLastProcessedText(currentClip);
+        await doCapture(currentClip);
+      }
+    }
   }
 
   function resetState() {
@@ -117,6 +129,7 @@
     showHistory = false;
     isMinimized = false;
     isWindowVisible = false;
+    setLastProcessedText("");
   }
 
   function handleNewChat() {
@@ -127,6 +140,7 @@
     showThemePicker = false;
     showHistory = false;
     isMinimized = false;
+    setLastProcessedText("");
   }
 
   async function handleToggleMinimize() {

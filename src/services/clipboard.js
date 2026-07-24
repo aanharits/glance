@@ -1,19 +1,39 @@
-// Clipboard Service — Tracks clipboard changes to prevent auto-processing old clipboard data.
+// Clipboard Service — Tracks clipboard changes to handle instant copy analysis.
 
 import { readText } from "@tauri-apps/plugin-clipboard-manager";
 
 let lastProcessedText = "";
 
 /**
- * Initializes clipboard tracking baseline with current text.
+ * Gets the last processed clipboard text string.
+ * @returns {string}
  */
-export async function syncClipboardBaseline() {
+export function getLastProcessedText() {
+  return lastProcessedText;
+}
+
+/**
+ * Manually updates last processed text string.
+ * @param {string} text
+ */
+export function setLastProcessedText(text) {
+  if (text) lastProcessedText = text.trim();
+}
+
+/**
+ * Reads current text from clipboard directly.
+ * @returns {Promise<string|null>}
+ */
+export async function getClipboardText() {
   try {
     const text = await readText();
-    if (text) {
-      lastProcessedText = text.trim();
+    if (text && text.trim().length > 0) {
+      return text.trim();
     }
-  } catch (err) {}
+  } catch (err) {
+    console.warn("Failed to read clipboard:", err);
+  }
+  return null;
 }
 
 /**
@@ -31,22 +51,8 @@ export async function checkNewCopy() {
         return trimmed;
       }
     }
-  } catch (err) {}
-  return null;
-}
-
-/**
- * Manually updates last processed text string.
- * @param {string} text
- */
-export function setLastProcessedText(text) {
-  if (text) lastProcessedText = text.trim();
-}
-
-/** Specific error for empty clipboard */
-export class ClipboardEmptyError extends Error {
-  constructor() {
-    super("Clipboard is empty — please copy text first.");
-    this.name = "ClipboardEmptyError";
+  } catch (err) {
+    console.warn("Failed to check clipboard copy:", err);
   }
+  return null;
 }
