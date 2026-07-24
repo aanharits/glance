@@ -4,7 +4,7 @@
 
 # Glance
 
-**Understand any complex paragraph, weird code snippet, or error message before your coffee gets cold.**
+**Understand any complex paragraph, weird code snippet, or error message with tiny window.**
 
 _Highlight obscure jargon, AI code, or error logs, press `Cmd+Shift+S`, copy, and get an instant ELI5 explanation or TL;DR summary right from your system tray._
 
@@ -50,11 +50,35 @@ No context switching. No opening ChatGPT tabs. No $20/month subscription traps.
 
 Glance is currently focused on delivering a native experience on **macOS**. Cross-platform support for Windows and Linux is currently under active development.
 
-| Operating System | Support Status | Details |
-| :--- | :--- | :--- |
-| **macOS** (Apple Silicon / Intel) | **Supported** | Native menu bar tray anchoring, macOS vibrancy, global shortcut (`Cmd+Shift+S`). |
-| **Windows** | **Coming Soon** | Taskbar system tray anchoring in development. |
-| **Linux** | **Coming Soon** | Desktop environment tray integration in development. |
+| Operating System                  | Support Status  | Details                                                                          |
+| :-------------------------------- | :-------------- | :------------------------------------------------------------------------------- |
+| **macOS** (Apple Silicon / Intel) | **Supported**   | Native menu bar tray anchoring, macOS vibrancy, global shortcut (`Cmd+Shift+S`). |
+| **Windows**                       | **Coming Soon** | Taskbar system tray anchoring in development.                                    |
+| **Linux**                         | **Coming Soon** | Desktop environment tray integration in development.                             |
+
+---
+
+## First-Time Launch (macOS Gatekeeper Note)
+
+> [!NOTE]
+> **Unverified Developer Notice**: Because Glance is an open-source tool without a $99/year Apple Developer Certificate, macOS Gatekeeper may show a warning saying *"Apple could not verify Glance is free of malware"*. This is standard for community-built open-source macOS software.
+
+### How to Bypass Gatekeeper (Choose Any 1 Method):
+
+- **Method 1: Right-Click Open (Recommended — 5 seconds)**
+  1. Move `Glance.app` (or extracted DMG) to your `/Applications` folder.
+  2. **Right-Click** (or `Ctrl + Click`) `Glance.app` and select **Open**.
+  3. Click **Open** in the dialog window. macOS will permanently save this approval.
+
+- **Method 2: System Settings**
+  1. Open **System Settings** -> **Privacy & Security**.
+  2. Scroll down to **Security** and click **"Open Anyway"** next to Glance.
+
+- **Method 3: Terminal Command**
+  Run this command in your terminal to remove the quarantine attribute:
+  ```bash
+  xattr -cr /Applications/Glance.app
+  ```
 
 ---
 
@@ -75,7 +99,7 @@ Why waste mental bandwidth decoding dense text or complex code? **Glance** handl
 ## Features
 
 - **Dual AI Modes (`Explain` & `Summary`)**: Seamlessly switch AI focus from the header title dropdown menu (`Glance - Explain` / `Glance - Summary`):
-  - **Explain Mode (Default)**: Optimized for unpacking complex code snippets, math formulas, compiler errors, technical jargon, or any confusing paragraph and unclear context that you do not understand. Delivers a clear, easy-to-digest ELI5 explanation of *why* and *how* something works.
+  - **Explain Mode (Default)**: Optimized for unpacking complex code snippets, math formulas, compiler errors, technical jargon, or any confusing paragraph and unclear context that you do not understand. Delivers a clear, easy-to-digest ELI5 explanation of _why_ and _how_ something works.
   - **Summary Mode**: Optimized for long paragraphs, dense whitepapers, wordy articles, or heavy documentation. Delivers a sharp **TL;DR** section followed by 3 to 5 scannable **Key Takeaways** with bold keywords, stripping away filler words.
 - **Active-Window Gated Copy**: Clipboard changes are ONLY processed when Glance is actively open. Copying text while Glance is closed does zero background processing and costs zero API tokens.
 - **Near-Zero Footprint**: Native Rust app using minimal RAM. The webview is destroyed when closed—zero background memory drain.
@@ -113,11 +137,11 @@ Glance is engineered to be invisible to system resources. Here is the exact brea
 
 Glance is 100% local-first and privacy-respecting. All session histories are stored in a clean JSON format via `@tauri-apps/plugin-store` in your OS application data folder:
 
-| Operating System | Storage Path | Status |
-| :--- | :--- | :--- |
-| **macOS** | `~/Library/Application Support/id.glance/history.json` | Active |
-| **Windows** | `%APPDATA%\id.glance\history.json` | Coming Soon |
-| **Linux** | `~/.config/id.glance/history.json` | Coming Soon |
+| Operating System | Storage Path                                           | Status      |
+| :--------------- | :----------------------------------------------------- | :---------- |
+| **macOS**        | `~/Library/Application Support/id.glance/history.json` | Active      |
+| **Windows**      | `%APPDATA%\id.glance\history.json`                     | Coming Soon |
+| **Linux**        | `~/.config/id.glance/history.json`                     | Coming Soon |
 
 ### Smart Memory & Token Safeguards
 
@@ -161,13 +185,13 @@ Glance is built with proactive safeguards to keep system usage lightweight and e
  └─────────────────────────────┬─────────────────────────────┘
 ```
 
-| Layer | Technologies & Purpose |
-| :--- | :--- |
-| **Frontend UI** | **Svelte 5 + Vite** — Reactive UI state, custom HSL design tokens, native spring transitions. |
-| **Backend Core** | **Rust + Tauri v2** — Cross-platform system integration, macOS Private API vibrancy & tray anchor. |
-| **Typography & Math** | **Marked.js + KaTeX** — GitHub-flavored markdown parsing + LaTeX mathematical rendering. |
-| **Local Storage** | **`@tauri-apps/plugin-store`** — Single-file JSON session history (`history.json`). |
-| **AI Inference** | **Groq API** (Llama 3.1 8B) for ultra-fast text, **Google Gemini 1.5** for vision. |
+| Layer                 | Technologies & Purpose                                                                             |
+| :-------------------- | :------------------------------------------------------------------------------------------------- |
+| **Frontend UI**       | **Svelte 5 + Vite** — Reactive UI state, custom HSL design tokens, native spring transitions.      |
+| **Backend Core**      | **Rust + Tauri v2** — Cross-platform system integration, macOS Private API vibrancy & tray anchor. |
+| **Typography & Math** | **Marked.js + KaTeX** — GitHub-flavored markdown parsing + LaTeX mathematical rendering.           |
+| **Local Storage**     | **`@tauri-apps/plugin-store`** — Single-file JSON session history (`history.json`).                |
+| **AI Inference**      | **Groq API** (Llama 3.1 8B) for ultra-fast text, **Google Gemini 1.5** for vision.                 |
 
 ---
 
