@@ -16,6 +16,42 @@
       return "";
     }
   }
+
+  function cleanMarkdown(str) {
+    if (!str) return "";
+    return str
+      .replace(/[\*\_\#\`\>]/g, "") // strip markdown syntax symbols (*, _, #, `, >)
+      .replace(/\[([^\]]+)\]\([^\)]+\)/g, "$1") // strip markdown links
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  function getHistoryTitle(item) {
+    // Prefer first copied text (inputText) as primary context title like ChatGPT/Claude
+    const rawInput = item.inputText || "";
+    const cleanInput = cleanMarkdown(rawInput);
+    if (cleanInput.length > 0) {
+      return cleanInput.length > 48 ? cleanInput.substring(0, 48) + "..." : cleanInput;
+    }
+
+    // Fallback to first line of AI response
+    const rawResult = item.resultText || "";
+    const cleanResult = cleanMarkdown(rawResult);
+    if (cleanResult.length > 0) {
+      return cleanResult.length > 48 ? cleanResult.substring(0, 48) + "..." : cleanResult;
+    }
+
+    return "Untitled Session";
+  }
+
+  function getHistoryPreview(item) {
+    const rawResult = item.resultText || "";
+    const cleanResult = cleanMarkdown(rawResult);
+    if (cleanResult.length > 0) {
+      return cleanResult.length > 85 ? cleanResult.substring(0, 85) + "..." : cleanResult;
+    }
+    return "";
+  }
 </script>
 
 <div class="history-panel" data-no-drag>
@@ -32,10 +68,18 @@
     {:else}
       {#each historyItems as item (item.id)}
         <div class="history-item" onclick={() => onSelectHistoryItem(item)}>
-          <p class="item-preview">{item.resultText}</p>
+          <div class="item-title-row">
+            <span class="item-title">{getHistoryTitle(item)}</span>
+          </div>
+
+          {#if getHistoryPreview(item)}
+            <p class="item-preview">{getHistoryPreview(item)}</p>
+          {/if}
+
           <div class="item-meta">
             <span class="item-time">{formatTime(item.timestamp)}</span>
           </div>
+
           <button
             class="delete-item-btn"
             title="Delete"
@@ -141,34 +185,55 @@
     margin-bottom: 6px;
     background: var(--surface);
     border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
   }
 
   .history-item:hover {
     border-color: var(--accent);
   }
 
-  .item-preview {
+  .item-title-row {
+    display: flex;
+    align-items: center;
+    padding-right: 18px;
+  }
+
+  .item-title {
     font-size: 12px;
+    font-weight: 600;
     color: var(--text-primary);
-    margin: 0 0 4px 0;
-    line-height: 1.4;
+    line-height: 1.35;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .item-preview {
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.35;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
     padding-right: 14px;
+    opacity: 0.88;
   }
 
   .item-meta {
     display: flex;
     justify-content: flex-end;
-    margin-top: 2px;
+    align-items: center;
+    margin-top: 3px;
   }
 
   .item-time {
-    font-size: 10px;
+    font-size: 9.5px;
     color: var(--text-secondary);
-    opacity: 0.85;
+    opacity: 0.8;
   }
 
   .delete-item-btn {
