@@ -28,14 +28,15 @@
     markedKatex({
       throwOnError: false,
       nonStandard: false,
-    })
+    }),
   );
 
   let bodyEl = $state(null);
 
   // Auto-scroll chat body to bottom when messages update
   $effect(() => {
-    messages; status;
+    messages;
+    status;
     tick().then(() => {
       if (bodyEl) {
         bodyEl.scrollTop = bodyEl.scrollHeight;
@@ -46,42 +47,15 @@
   function parseMarkdown(text) {
     if (!text) return "";
     // Preprocess standalone currency dollar signs (e.g. $20, $0.0001) so KaTeX does not misinterpret them as LaTeX math delimiters
-    const sanitized = text.replace(/(^|[^\\$])\$([0-9]+(?:[.,][0-9]+)?)\b/g, "$1\\$$2");
+    const sanitized = text.replace(
+      /(^|[^\\$])\$([0-9]+(?:[.,][0-9]+)?)\b/g,
+      "$1\\$$2",
+    );
     return marked.parse(sanitized);
   }
 </script>
 
 <div class="card-body" bind:this={bodyEl}>
-  <!-- Segmented Control Mode Tabs -->
-  <div class="mode-tabs-container" data-no-drag>
-    <button
-      class="mode-tab"
-      class:active={activeMode === "explain"}
-      onclick={() => onSelectMode("explain")}
-      title="Explain Mode: Detailed yet concise breakdown of concepts, code, math, or errors"
-    >
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="10" />
-        <line x1="12" y1="16" x2="12" y2="12" />
-        <line x1="12" y1="8" x2="12.01" y2="8" />
-      </svg>
-      Explain
-    </button>
-    <button
-      class="mode-tab"
-      class:active={activeMode === "summary"}
-      onclick={() => onSelectMode("summary")}
-      title="Summary Mode: TL;DR bullet-point summary of long text, articles, or documentation"
-    >
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="21" y1="6" x2="3" y2="6" />
-        <line x1="15" y1="12" x2="3" y2="12" />
-        <line x1="17" y1="18" x2="3" y2="18" />
-      </svg>
-      Summary
-    </button>
-  </div>
-
   {#if status === "idle" && messages.length === 0}
     <p class="loading-text">Copy any text (Cmd+C / Ctrl+C) to analyze…</p>
   {:else if messages.length === 0 && status === "loading"}
@@ -90,7 +64,11 @@
     <div class="chat-thread">
       {#each messages as msg, i (i)}
         <div class="bubble-row" class:user-row={msg.role === "user"}>
-          <div class="chat-bubble" class:user-bubble={msg.role === "user"} class:ai-bubble={msg.role === "assistant"}>
+          <div
+            class="chat-bubble"
+            class:user-bubble={msg.role === "user"}
+            class:ai-bubble={msg.role === "assistant"}
+          >
             {#if msg.role === "user"}
               <span class="user-text">{msg.content}</span>
             {:else}
@@ -115,7 +93,9 @@
   {/if}
 
   {#if status === "error"}
-    <p class="error-text">{errorText || "Failed to process. Please try again."}</p>
+    <p class="error-text">
+      {errorText || "Failed to process. Please try again."}
+    </p>
   {/if}
 </div>
 
@@ -162,7 +142,11 @@
     background: transparent;
     border: 1px solid transparent;
     cursor: pointer;
-    transition: background 150ms ease, color 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
+    transition:
+      background 150ms ease,
+      color 150ms ease,
+      border-color 150ms ease,
+      box-shadow 150ms ease;
   }
 
   .mode-tab:hover {
@@ -253,8 +237,15 @@
   }
 
   @keyframes typing {
-    0%, 100% { opacity: 0.3; transform: scale(0.8); }
-    50% { opacity: 1; transform: scale(1.1); }
+    0%,
+    100% {
+      opacity: 0.3;
+      transform: scale(0.8);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.1);
+    }
   }
 
   @keyframes userBubbleIn {
@@ -346,7 +337,8 @@
   }
 
   .result-html :global(code) {
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+      monospace;
     font-size: 0.88em;
     background: rgba(255, 255, 255, 0.1);
     padding: 2px 6px;

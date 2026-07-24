@@ -4,37 +4,166 @@
    *   showThemePicker: boolean,
    *   showHistory?: boolean,
    *   isMinimized?: boolean,
+   *   activeMode?: 'explain' | 'summary',
    *   headerEl: HTMLElement | null,
    *   onToggleTheme: () => void,
    *   onToggleHistory: () => void,
    *   onToggleMinimize: () => void,
-   *   onClose: () => void
+   *   onNewChat: () => void,
+   *   onClose: () => void,
+   *   onSelectMode?: (mode: 'explain' | 'summary') => void
    * }} */
   let {
     status,
     showThemePicker,
     showHistory = false,
     isMinimized = false,
+    activeMode = "explain",
     headerEl = $bindable(null),
     onToggleTheme,
     onToggleHistory,
     onToggleMinimize,
     onNewChat,
     onClose,
+    onSelectMode = () => {},
   } = $props();
+
+  let showModeDropdown = $state(false);
+
+  function toggleModeDropdown(e) {
+    e.stopPropagation();
+    showModeDropdown = !showModeDropdown;
+  }
+
+  function handlePickMode(mode, e) {
+    e.stopPropagation();
+    showModeDropdown = false;
+    onSelectMode(mode);
+  }
+
+  function handleOutsideClick() {
+    if (showModeDropdown) showModeDropdown = false;
+  }
 </script>
+
+<svelte:window onclick={handleOutsideClick} />
 
 <div class="card-header" bind:this={headerEl}>
   <!-- Concentric Rings Brand Logo -->
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="brand-logo" class:pulse={status === "loading"}>
-    <circle cx="12" cy="12" r="9.5" stroke="var(--accent)" stroke-width="1.8" opacity="0.55" />
-    <circle cx="12" cy="12" r="5.5" stroke="var(--accent)" stroke-width="1.8" opacity="0.85" />
+  <svg
+    width="18"
+    height="18"
+    viewBox="0 0 24 24"
+    fill="none"
+    class="brand-logo"
+    class:pulse={status === "loading"}
+  >
+    <circle
+      cx="12"
+      cy="12"
+      r="9.5"
+      stroke="var(--accent)"
+      stroke-width="1.8"
+      opacity="0.55"
+    />
+    <circle
+      cx="12"
+      cy="12"
+      r="5.5"
+      stroke="var(--accent)"
+      stroke-width="1.8"
+      opacity="0.85"
+    />
     <circle cx="12" cy="12" r="2.2" fill="var(--accent)" />
   </svg>
 
-  <span class="label">
-    {status === "loading" ? "Analyzing…" : "Glance"}
-  </span>
+  <!-- Title & Mode Dropdown Wrapper -->
+  <div class="mode-dropdown-wrapper" data-no-drag>
+    <button
+      class="mode-dropdown-btn"
+      onclick={toggleModeDropdown}
+      aria-label="Select Mode"
+      title="Click to change mode (Explain / Summary)"
+    >
+      <span class="header-title">
+        {status === "loading" ? "Analyzing…" : "Glance"}
+      </span>
+      {#if status !== "loading"}
+        <span class="mode-separator">-</span>
+        <span class="mode-name"
+          >{activeMode === "summary" ? "Summary" : "Explain"}</span
+        >
+        <svg
+          width="10"
+          height="10"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          class="chevron-icon"
+          class:open={showModeDropdown}
+        >
+          <polyline points="6 9 12 15 18 9" />
+        </svg>
+      {/if}
+    </button>
+
+    {#if showModeDropdown}
+      <div class="mode-menu">
+        {#if activeMode === "summary"}
+          <button
+            class="mode-menu-item"
+            onclick={(e) => handlePickMode("explain", e)}
+          >
+            <svg
+              width="13"
+              height="13"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="16" x2="12" y2="12" />
+              <line x1="12" y1="8" x2="12.01" y2="8" />
+            </svg>
+            <div class="mode-info">
+              <span class="mode-title">Switch to Explain</span>
+              <span class="mode-desc">Detailed ELI5 breakdown</span>
+            </div>
+          </button>
+        {:else}
+          <button
+            class="mode-menu-item"
+            onclick={(e) => handlePickMode("summary", e)}
+          >
+            <svg
+              width="13"
+              height="13"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <line x1="21" y1="6" x2="3" y2="6" />
+              <line x1="15" y1="12" x2="3" y2="12" />
+              <line x1="17" y1="18" x2="3" y2="18" />
+            </svg>
+            <div class="mode-info">
+              <span class="mode-title">Switch to Summary</span>
+              <span class="mode-desc">TL;DR bullet points</span>
+            </div>
+          </button>
+        {/if}
+      </div>
+    {/if}
+  </div>
+
+  <div class="header-spacer"></div>
 
   <div class="header-actions" class:hidden={isMinimized}>
     <!-- New Chat Button -->
@@ -169,13 +298,134 @@
     }
   }
 
-  .label {
+  .header-spacer {
+    flex: 1;
+  }
+
+  .mode-dropdown-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .mode-dropdown-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: transparent;
+    border: none;
+    padding: 3px 6px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 150ms ease;
+  }
+
+  .mode-dropdown-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  .header-title {
     font-size: 13px;
     font-weight: 600;
     color: var(--text-primary);
-    letter-spacing: -0.01em;
-    flex: 1;
-    pointer-events: none;
+  }
+
+  .mode-separator {
+    font-size: 13px;
+    color: var(--text-secondary);
+    opacity: 0.5;
+    margin: 0 1px;
+  }
+
+  .mode-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent);
+  }
+
+  .chevron-icon {
+    transition: transform 200ms ease;
+    stroke: var(--text-secondary);
+    margin-left: 2px;
+  }
+
+  .chevron-icon.open {
+    transform: rotate(180deg);
+    stroke: var(--accent);
+  }
+
+  .mode-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    width: 180px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 4px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(16px);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    animation: menuFadeIn 150ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes menuFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-4px) scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .mode-menu-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    text-align: left;
+    transition: all 120ms ease;
+  }
+
+  .mode-menu-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-primary);
+  }
+
+  .mode-menu-item.active {
+    background: rgba(168, 85, 247, 0.15);
+    color: var(--text-primary);
+  }
+
+  .mode-menu-item.active svg {
+    stroke: var(--accent);
+  }
+
+  .mode-info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .mode-title {
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  .mode-desc {
+    font-size: 9.5px;
+    color: var(--text-secondary);
+    margin-top: 1px;
   }
 
   .icon-btn {
@@ -186,7 +436,9 @@
     padding: 4px;
     display: flex;
     border-radius: 6px;
-    transition: background 150ms, color 150ms;
+    transition:
+      background 150ms,
+      color 150ms;
   }
 
   .icon-btn:hover,

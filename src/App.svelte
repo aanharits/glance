@@ -3,10 +3,7 @@
   import { onMount, onDestroy, tick } from "svelte";
   import { slide } from "svelte/transition";
   import { listen } from "@tauri-apps/api/event";
-  import {
-    checkNewCopy,
-    syncClipboardBaseline,
-  } from "./services/clipboard.js";
+  import { checkNewCopy, syncClipboardBaseline } from "./services/clipboard.js";
   import { askGroq } from "./services/groq.js";
   import {
     resizeToContent,
@@ -79,7 +76,7 @@
       if (newText) {
         doCapture(newText);
       }
-    }, 250);
+    }, 200);
   });
 
   onDestroy(() => {
@@ -263,9 +260,10 @@
   async function handleSelectHistoryItem(item) {
     currentSessionId = item.id;
     activeMode = item.mode || "explain";
-    chatMessages = item.messages && item.messages.length > 0
-      ? item.messages
-      : [{ role: "assistant", content: item.resultText }];
+    chatMessages =
+      item.messages && item.messages.length > 0
+        ? item.messages
+        : [{ role: "assistant", content: item.resultText }];
     currentText = item.inputText || "";
     status = "result";
     showHistory = false;
@@ -290,6 +288,7 @@
       {showThemePicker}
       {showHistory}
       {isMinimized}
+      {activeMode}
       bind:headerEl
       onToggleTheme={() => {
         showThemePicker = !showThemePicker;
@@ -302,6 +301,7 @@
       onToggleMinimize={handleToggleMinimize}
       onNewChat={handleNewChat}
       onClose={handleClose}
+      onSelectMode={handleSelectMode}
     />
 
     {#if !isMinimized}
