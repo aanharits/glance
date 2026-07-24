@@ -11,32 +11,32 @@ export const PRESET_THEMES = [
     name: "Midnight Purple",
     color: "#a855f7",
     accent: "#a855f7",
-    accentSoft: "rgba(168, 85, 247, 0.15)",
-    tintBg: "radial-gradient(circle at 50% 0%, rgba(88, 28, 135, 0.35), transparent 75%)",
+    accentSoft: "rgba(168, 85, 247, 0.12)",
+    tintBg: "radial-gradient(ellipse at 0% 100%, rgba(100, 40, 160, 0.28) 0%, transparent 65%)",
   },
   {
     id: "ocean-teal",
     name: "Ocean Teal",
     color: "#14b8a6",
     accent: "#14b8a6",
-    accentSoft: "rgba(20, 184, 166, 0.15)",
-    tintBg: "radial-gradient(circle at 50% 0%, rgba(15, 118, 110, 0.25), transparent 70%)",
+    accentSoft: "rgba(20, 184, 166, 0.12)",
+    tintBg: "radial-gradient(ellipse at 0% 100%, rgba(13, 100, 92, 0.28) 0%, transparent 65%)",
   },
   {
     id: "sunset-coral",
     name: "Sunset Coral",
     color: "#f97316",
     accent: "#f97316",
-    accentSoft: "rgba(249, 115, 22, 0.15)",
-    tintBg: "radial-gradient(circle at 50% 0%, rgba(194, 65, 12, 0.25), transparent 70%)",
+    accentSoft: "rgba(249, 115, 22, 0.12)",
+    tintBg: "radial-gradient(ellipse at 0% 100%, rgba(160, 60, 10, 0.28) 0%, transparent 65%)",
   },
   {
     id: "monochrome",
     name: "Monochrome",
     color: "#a1a1aa",
     accent: "#a1a1aa",
-    accentSoft: "rgba(161, 161, 170, 0.15)",
-    tintBg: "radial-gradient(circle at 50% 0%, rgba(63, 63, 70, 0.25), transparent 70%)",
+    accentSoft: "rgba(161, 161, 170, 0.12)",
+    tintBg: "radial-gradient(ellipse at 0% 100%, rgba(60, 60, 70, 0.28) 0%, transparent 65%)",
   },
 ];
 
@@ -55,10 +55,10 @@ export function applyTheme(themeId, customColor = null) {
   if (themeId === "custom" && customColor) {
     customHexColor = customColor;
     root.style.setProperty("--accent", customColor);
-    root.style.setProperty("--accent-soft", `${customColor}24`);
+    root.style.setProperty("--accent-soft", `${customColor}1e`);
     root.style.setProperty(
       "--theme-tint-bg",
-      `radial-gradient(circle at 50% 0%, ${customColor}33, transparent 70%)`
+      `radial-gradient(ellipse at 0% 100%, ${customColor}47 0%, transparent 65%)`
     );
     return;
   }

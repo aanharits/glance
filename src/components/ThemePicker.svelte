@@ -7,7 +7,8 @@
    *   onSelectPreset: (id: string) => void,
    *   onCustomColorInput: (e: Event) => void
    * }} */
-  let { currentThemeId, customColorHex, onSelectPreset, onCustomColorInput } = $props();
+  let { currentThemeId, customColorHex, onSelectPreset, onCustomColorInput } =
+    $props();
 </script>
 
 <div class="theme-panel" data-no-drag>
@@ -25,7 +26,11 @@
     {/each}
 
     <!-- Native Custom Color Picker -->
-    <label class="swatch custom-picker" class:selected={currentThemeId === "custom"} title="Custom Color">
+    <label
+      class="swatch custom-picker"
+      class:selected={currentThemeId === "custom"}
+      title="Custom Color"
+    >
       <input
         type="color"
         value={customColorHex}
@@ -69,7 +74,9 @@
     border: 2px solid transparent;
     cursor: pointer;
     padding: 0;
-    transition: transform 150ms ease, border-color 150ms ease;
+    transition:
+      transform 150ms ease,
+      border-color 150ms ease;
   }
 
   .swatch:hover {
