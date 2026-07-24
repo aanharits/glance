@@ -7,9 +7,17 @@
   /** @type {{
    *   status: string,
    *   messages: Array<{ role: 'user' | 'assistant', content: string }>,
-   *   errorText: string
+   *   errorText: string,
+   *   activeMode?: 'explain' | 'summary',
+   *   onSelectMode?: (mode: 'explain' | 'summary') => void
    * }} */
-  let { status, messages = [], errorText } = $props();
+  let {
+    status,
+    messages = [],
+    errorText,
+    activeMode = "explain",
+    onSelectMode = () => {},
+  } = $props();
 
   marked.setOptions({
     gfm: true,
@@ -44,6 +52,36 @@
 </script>
 
 <div class="card-body" bind:this={bodyEl}>
+  <!-- Segmented Control Mode Tabs -->
+  <div class="mode-tabs-container" data-no-drag>
+    <button
+      class="mode-tab"
+      class:active={activeMode === "explain"}
+      onclick={() => onSelectMode("explain")}
+      title="Explain Mode: Detailed yet concise breakdown of concepts, code, math, or errors"
+    >
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10" />
+        <line x1="12" y1="16" x2="12" y2="12" />
+        <line x1="12" y1="8" x2="12.01" y2="8" />
+      </svg>
+      Explain
+    </button>
+    <button
+      class="mode-tab"
+      class:active={activeMode === "summary"}
+      onclick={() => onSelectMode("summary")}
+      title="Summary Mode: TL;DR bullet-point summary of long text, articles, or documentation"
+    >
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="21" y1="6" x2="3" y2="6" />
+        <line x1="15" y1="12" x2="3" y2="12" />
+        <line x1="17" y1="18" x2="3" y2="18" />
+      </svg>
+      Summary
+    </button>
+  </div>
+
   {#if status === "idle" && messages.length === 0}
     <p class="loading-text">Copy any text (Cmd+C / Ctrl+C) to analyze…</p>
   {:else if messages.length === 0 && status === "loading"}
@@ -96,6 +134,51 @@
     display: none;
     width: 0;
     height: 0;
+  }
+
+  .mode-tabs-container {
+    display: flex;
+    gap: 3px;
+    padding: 3px;
+    background: rgba(0, 0, 0, 0.28);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    margin-bottom: 12px;
+    flex-shrink: 0;
+  }
+
+  .mode-tab {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 5px 10px;
+    border-radius: 7px;
+    font-size: 11.5px;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    color: var(--text-secondary);
+    background: transparent;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: background 150ms ease, color 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
+  }
+
+  .mode-tab:hover {
+    color: var(--text-primary);
+  }
+
+  .mode-tab.active {
+    background: var(--surface);
+    color: var(--text-primary);
+    border-color: var(--border);
+    font-weight: 600;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+  }
+
+  .mode-tab.active svg {
+    stroke: var(--accent);
   }
 
   .chat-thread {

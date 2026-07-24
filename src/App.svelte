@@ -39,6 +39,7 @@
   let isMinimized = $state(false);
   let savedFullHeight = $state(0); // stores window height before minimizing
   let currentSessionId = $state(null); // stores active roomchat session ID
+  let activeMode = $state("explain"); // 'explain' | 'summary'
   let currentText = $state("");
   let historyItems = $state([]);
   let currentThemeId = $state("midnight-purple");
@@ -53,8 +54,6 @@
   /** @type {(() => void) | null} */
   let unlistenSnap = null;
   /** @type {(() => void) | null} */
-  let unlistenClose = null;
-  /** @type {(() => void) | null} */
   let unlistenTheme = null;
   /** @type {any} */
   let clipboardInterval = null;
@@ -67,9 +66,6 @@
     historyItems = await getHistory();
 
     unlistenSnap = await listen("snap:triggered", handleSnap);
-    unlistenClose = await listen("snap:close", () => {
-      if (isWindowVisible) handleClose();
-    });
     unlistenTheme = await listen(
       "theme:changed",
       (e) => e.payload && selectPresetTheme(e.payload),
@@ -88,7 +84,6 @@
 
   onDestroy(() => {
     if (unlistenSnap) unlistenSnap();
-    if (unlistenClose) unlistenClose();
     if (unlistenTheme) unlistenTheme();
     if (clipboardInterval) clearInterval(clipboardInterval);
   });
@@ -182,6 +177,16 @@
     if (e.key === "Escape") handleClose();
   }
 
+  async function handleSelectMode(mode) {
+    if (activeMode === mode) return;
+    activeMode = mode;
+    // Re-analyze current text seamlessly under the new mode
+    if (currentText) {
+      chatMessages = [];
+      await doCapture(currentText);
+    }
+  }
+
   async function doCapture(text) {
     if (!text) return;
     try {
@@ -191,7 +196,7 @@
         // Start a brand new session
         currentSessionId = Date.now().toString();
         status = "loading";
-        const res = await askGroq(text);
+        const res = await askGroq(text, [], activeMode);
         chatMessages = [
           { role: "user", content: text },
           { role: "assistant", content: res },
@@ -200,6 +205,7 @@
 
         historyItems = await saveHistory({
           id: currentSessionId,
+          mode: activeMode,
           inputText: text,
           resultText: res,
           messages: chatMessages,
@@ -210,12 +216,13 @@
         chatMessages = [...chatMessages, { role: "user", content: text }];
         status = "loading";
 
-        const res = await askGroq(text, previousHistory);
+        const res = await askGroq(text, previousHistory, activeMode);
         chatMessages = [...chatMessages, { role: "assistant", content: res }];
         status = "result";
 
         historyItems = await saveHistory({
           id: currentSessionId,
+          mode: activeMode,
           inputText: text,
           resultText: res,
           messages: chatMessages,
@@ -238,12 +245,13 @@
       chatMessages = [...chatMessages, { role: "user", content: prompt }];
       status = "loading";
 
-      const res = await askGroq(prompt, previousHistory);
+      const res = await askGroq(prompt, previousHistory, activeMode);
       chatMessages = [...chatMessages, { role: "assistant", content: res }];
       status = "result";
 
       historyItems = await saveHistory({
         id: currentSessionId,
+        mode: activeMode,
         inputText: prompt,
         resultText: res,
         messages: chatMessages,
@@ -257,6 +265,7 @@
 
   async function handleSelectHistoryItem(item) {
     currentSessionId = item.id;
+    activeMode = item.mode || "explain";
     chatMessages = item.messages && item.messages.length > 0
       ? item.messages
       : [{ role: "assistant", content: item.resultText }];
@@ -320,7 +329,13 @@
             onClearAllHistory={handleClearAllHistory}
           />
         {:else}
-          <PopupBody {status} messages={chatMessages} {errorText} />
+          <PopupBody
+            {status}
+            messages={chatMessages}
+            {errorText}
+            {activeMode}
+            onSelectMode={handleSelectMode}
+          />
 
           {#if status === "result" || chatMessages.length > 0}
             <FollowUpInput
