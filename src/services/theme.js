@@ -4,39 +4,39 @@ import { LazyStore } from "@tauri-apps/plugin-store";
 
 const store = new LazyStore("settings.json");
 
-/** Curated theme preset definitions */
+/** Curated theme preset definitions with subtle top-ambient radial glows */
 export const PRESET_THEMES = [
   {
     id: "midnight-purple",
     name: "Midnight Purple",
     color: "#a855f7",
     accent: "#a855f7",
-    accentSoft: "rgba(168, 85, 247, 0.12)",
-    tintBg: "radial-gradient(ellipse at 0% 100%, rgba(100, 40, 160, 0.28) 0%, transparent 65%)",
+    accentSoft: "rgba(168, 85, 247, 0.14)",
+    tintBg: "radial-gradient(ellipse 90% 60% at 50% -10%, rgba(168, 85, 247, 0.16) 0%, transparent 85%)",
   },
   {
     id: "ocean-teal",
     name: "Ocean Teal",
     color: "#14b8a6",
     accent: "#14b8a6",
-    accentSoft: "rgba(20, 184, 166, 0.12)",
-    tintBg: "radial-gradient(ellipse at 0% 100%, rgba(13, 100, 92, 0.28) 0%, transparent 65%)",
+    accentSoft: "rgba(20, 184, 166, 0.14)",
+    tintBg: "radial-gradient(ellipse 90% 60% at 50% -10%, rgba(20, 184, 166, 0.16) 0%, transparent 85%)",
   },
   {
     id: "sunset-coral",
     name: "Sunset Coral",
     color: "#f97316",
     accent: "#f97316",
-    accentSoft: "rgba(249, 115, 22, 0.12)",
-    tintBg: "radial-gradient(ellipse at 0% 100%, rgba(160, 60, 10, 0.28) 0%, transparent 65%)",
+    accentSoft: "rgba(249, 115, 22, 0.14)",
+    tintBg: "radial-gradient(ellipse 90% 60% at 50% -10%, rgba(249, 115, 22, 0.16) 0%, transparent 85%)",
   },
   {
     id: "monochrome",
     name: "Monochrome",
     color: "#a1a1aa",
     accent: "#a1a1aa",
-    accentSoft: "rgba(161, 161, 170, 0.12)",
-    tintBg: "radial-gradient(ellipse at 0% 100%, rgba(60, 60, 70, 0.28) 0%, transparent 65%)",
+    accentSoft: "rgba(161, 161, 170, 0.14)",
+    tintBg: "radial-gradient(ellipse 90% 60% at 50% -10%, rgba(161, 161, 170, 0.14) 0%, transparent 85%)",
   },
 ];
 
@@ -55,10 +55,10 @@ export function applyTheme(themeId, customColor = null) {
   if (themeId === "custom" && customColor) {
     customHexColor = customColor;
     root.style.setProperty("--accent", customColor);
-    root.style.setProperty("--accent-soft", `${customColor}1e`);
+    root.style.setProperty("--accent-soft", `${customColor}24`);
     root.style.setProperty(
       "--theme-tint-bg",
-      `radial-gradient(ellipse at 0% 100%, ${customColor}47 0%, transparent 65%)`
+      `radial-gradient(ellipse 90% 60% at 50% -10%, ${customColor}26 0%, transparent 85%)`
     );
     return;
   }
