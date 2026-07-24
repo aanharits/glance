@@ -177,14 +177,11 @@
     if (e.key === "Escape") handleClose();
   }
 
-  async function handleSelectMode(mode) {
+  function handleSelectMode(mode) {
     if (activeMode === mode) return;
     activeMode = mode;
-    // Re-analyze current text seamlessly under the new mode
-    if (currentText) {
-      chatMessages = [];
-      await doCapture(currentText);
-    }
+    // Mode tab switch only updates activeMode for the NEXT capture / follow-up.
+    // Preserves existing conversation responses without auto-triggering or reading clipboard.
   }
 
   async function doCapture(text) {
