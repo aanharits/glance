@@ -13,7 +13,6 @@ _Highlight obscure jargon, AI code, or error logs, press `Cmd+Shift+S`, copy, an
 [![Rust](https://img.shields.io/badge/Rust-Backend-000000?logo=rust)](https://www.rust-lang.org)
 [![Markdown](https://img.shields.io/badge/Markdown-marked-000000)](https://marked.js.org)
 [![Math](https://img.shields.io/badge/LaTeX-KaTeX-00b894)](https://katex.org)
-[![BYOK](https://img.shields.io/badge/API-BYOK-green)](#setup-your-api-keys-byok)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 </div>
@@ -46,33 +45,6 @@ No context switching. No opening ChatGPT tabs. No $20/month subscription traps.
 
 ---
 
-## How to Use
-
-### 1. Clipboard Mode (Text & Follow-up)
-
-1. **Open Glance (`Cmd+Shift+S`)**: Press `Cmd+Shift+S` (or `Ctrl+Shift+S` on Windows/Linux) or click the Glance tray icon (`◎`). The Glance popup window will open cleanly without sending old clipboard data to AI.
-2. **Highlight & Copy (`Cmd+C`)**: Select any confusing text, code snippet, math formula, or error message anywhere on your screen (Browser, IDE, PDF, Terminal, Slack) and press **`Cmd+C`** (or `Ctrl+C`).
-3. **Auto AI Analysis & Follow-Up**: Glance automatically detects the new copy event while open, streams a clear ELI5 explanation, and lets you type follow-up questions in the input box at the bottom.
-4. **Dismiss (`Esc`)**: Press **`Esc`** (or click away) to close the window.
-
-### 2. Vision Mode (Drag & Select Screenshot) — _In Development_
-
-1. Press **`Cmd+Shift+S`**.
-2. **Drag & Select**: Drag a box around any chart, diagram, code block, or untranslatable image on your screen.
-3. **Instant Analysis**: Gemini Vision analyzes the selected region and gives you an immediate breakdown.
-
----
-
-## Local Chat History & Storage
-
-Glance includes a lightweight local history store:
-
-- **Local Storage (`history.json`)**: All recent analysis items are stored locally on your device via `@tauri-apps/plugin-store`. No external database (like SQLite) or server overhead required.
-- **Max History Capacity**: Holds up to **20 recent chat items**. Older items are automatically rotated out.
-- **History Drawer**: Click the History Icon (`📜`) in the header to view, reload, or delete past items, or clear all history with one click.
-
----
-
 ## Use Cases
 
 Why waste mental bandwidth decoding dense text or complex code? **Glance** handles:
@@ -92,65 +64,91 @@ Why waste mental bandwidth decoding dense text or complex code? **Glance** handl
 - **Near-Zero Footprint**: Native Rust app using minimal RAM. The webview is destroyed when closed—zero background memory drain.
 - **Tray-Anchored Popup**: Appears seamlessly under your system tray icon (top-right menu bar on macOS, bottom-right taskbar on Windows).
 - **Rich Markdown & LaTeX Rendering**: Full support for bold/italic typography, inline code blocks, formatted lists, and LaTeX math formulas (`$...$` and `$$...$$` rendered via KaTeX).
-- **Bring Your Own Key (BYOK)**: Connect your free Groq or Gemini API keys. Pay `$0.0001` per month instead of `$20` SaaS fees.
-- **Multi-Turn Chat Thread**: Ask follow-up questions with iMessage-style smooth bubble transitions.
+- **Multi-Turn Roomchat Session**: Ask follow-up questions or paste multiple snippets into the same roomchat without creating duplicate history entries.
 - **Keyboard-First Design**: Press `Esc` to close, `Cmd+C` to copy text.
 
 ---
 
-## Development & Installation
+## How to Use
 
-> **Note**: Glance is currently under active development. Pre-built binary installers (`.dmg` / `.exe`) will be made available under GitHub Releases once v1.0 is ready.
+### 1. Clipboard Mode (Text & Follow-up)
 
-### Build from Source
+1. **Open Glance (`Cmd+Shift+S`)**: Press `Cmd+Shift+S` (or `Ctrl+Shift+S` on Windows/Linux) or click the Glance tray icon (`◎`). The Glance popup window will open cleanly without sending old clipboard data to AI.
+2. **Highlight & Copy (`Cmd+C`)**: Select any confusing text, code snippet, math formula, or error message anywhere on your screen (Browser, IDE, PDF, Terminal, Slack) and press **`Cmd+C`** (or `Ctrl+C`).
+3. **Auto AI Analysis & Follow-Up**: Glance automatically detects the new copy event while open, streams a clear ELI5 explanation, and lets you type follow-up questions in the input box at the bottom.
+4. **New Chat (`+`)**: Click the **`+` (Plus)** button in the header to start a fresh roomchat at any time.
+5. **Dismiss (`Esc`)**: Press **`Esc`** (or click away) to close the window.
 
-```bash
-# 1. Clone the repository
-git clone https://github.com/your-username/glance.git
-cd glance
+### 2. Vision Mode (Drag & Select Screenshot) — _In Development_
 
-# 2. Install dependencies
-npm install
-
-# 3. Run in local dev mode (Hot-reload)
-npm run tauri dev
-
-# 4. Build standalone installer executable for your OS
-npm run tauri build
-```
+1. Press **`Cmd+Shift+S`**.
+2. **Drag & Select**: Drag a box around any chart, diagram, code block, or untranslatable image on your screen.
+3. **Instant Analysis**: Gemini Vision analyzes the selected region and gives you an immediate breakdown.
 
 ---
 
-## Setup Your API Keys (BYOK)
+## Behind the Scenes & Performance Proof
 
-Glance supports free-tier API keys:
+Glance is engineered to be invisible to system resources. Here is the exact breakdown of how data and memory are handled:
 
-1. Get a free API Key from [Groq Console](https://console.groq.com/) (for sub-second text explanations).
-2. Get a free API Key from [Google AI Studio](https://aistudio.google.com/) (for vision / screenshot analysis).
-3. Save your keys in the app settings.
+### Where is Chat History Stored?
+
+Glance is 100% local-first and privacy-respecting. All session histories are stored in a clean JSON format via `@tauri-apps/plugin-store` in your OS application data folder:
+
+| Operating System | Storage Path |
+| :--- | :--- |
+| **macOS** | `~/Library/Application Support/id.aan.glance/history.json` |
+| **Windows** | `%APPDATA%\id.aan.glance\history.json` |
+| **Linux** | `~/.config/id.aan.glance/history.json` |
+
+### Smart Memory & Token Safeguards
+
+Glance is built with proactive safeguards to keep system usage lightweight and efficient:
+
+- **Disk Protection (~100 KB Cap)**: Automatically caps stored history to 20 sessions, keeping total disk storage under 0.1 MB.
+- **RAM Optimization (~0.2 MB Text Heap)**: Minimal memory footprint (~30–50 MB total app process), 1,000x lighter than keeping a browser tab open.
+- **Token Overflow Prevention (Sliding Window)**: Automatically caps API context to the 10 most recent messages, preventing token waste and context length errors during long conversations.
 
 ---
 
 ## Architecture & Tech Stack
 
 ```
-           [ Tray Icon / Global Shortcut ]
-                          │ (Cmd+Shift+S)
-                          ▼
-                  [ Tauri Rust Core ]
-              ├── System Tray Anchored Positioning
-              ├── System Clipboard / Active Copy Tracking
-              └── Lightweight Popup Lifecycle
-                          │
-                          ▼
-             [ Minimalist Svelte 5 UI ] ──( Fetch API )──► Groq / Gemini
+ ┌───────────────────────────────────────────────────────────┐
+ │               Global Shortcut / System Tray               │
+ └─────────────────────────────┬─────────────────────────────┘
+                               │ (Cmd + Shift + S)
+                               ▼
+ ┌───────────────────────────────────────────────────────────┐
+ │                     Tauri Rust Core                       │
+ │  • System Tray Anchored Position                          │
+ │  • Gated Clipboard Listener                               │
+ │  • Native macOS/Windows Window Lifecycle                  │
+ └─────────────────────────────┬─────────────────────────────┘
+                               │ (IPC Bridge)
+                               ▼
+ ┌───────────────────────────────────────────────────────────┐
+ │                 Minimalist Svelte 5 UI                    │
+ │  • 120Hz Smooth Spring Animations                         │
+ │  • Marked.js Markdown + KaTeX Math Rendering              │
+ │  • Local Storage Store (history.json)                     │
+ └─────────────────────────────┬─────────────────────────────┘
+                               │ (HTTPS API)
+                               ▼
+ ┌───────────────────────────────────────────────────────────┐
+ │                    Cloud AI Providers                     │
+ │  • Groq (Llama 3.1 8B Instant Text Analysis)             │
+ │  • Gemini 1.5 Flash (Vision & Screenshot OCR)             │
+ └───────────────────────────────────────────────────────────┘
 ```
 
-- **Frontend**: Svelte 5 + Vite (Vanilla CSS, custom design tokens, dark themes).
-- **Markdown & Math**: `marked` (GitHub-Flavored Markdown parser) + `KaTeX` (LaTeX math rendering engine).
-- **Backend**: Rust + Tauri v2 (macOS Private API enabled for native blur/vibrancy effects).
-- **Storage**: `@tauri-apps/plugin-store` (`history.json`, max 20 items).
-- **AI Models**: Groq (Llama 3.1 8B) & Gemini 1.5 Flash Vision.
+| Layer | Technologies & Purpose |
+| :--- | :--- |
+| **Frontend UI** | **Svelte 5 + Vite** — Reactive UI state, custom HSL design tokens, native spring transitions. |
+| **Backend Core** | **Rust + Tauri v2** — Cross-platform system integration, macOS Private API vibrancy & tray anchor. |
+| **Typography & Math** | **Marked.js + KaTeX** — GitHub-flavored markdown parsing + LaTeX mathematical rendering. |
+| **Local Storage** | **`@tauri-apps/plugin-store`** — Single-file JSON session history (`history.json`). |
+| **AI Inference** | **Groq API** (Llama 3.1 8B) for ultra-fast text, **Google Gemini 1.5** for vision. |
 
 ---
 
@@ -160,4 +158,4 @@ Contributions are welcome! Feel free to open an issue or submit a pull request.
 
 ## License
 
-[MIT](LICENSE)
+[MIT](LICENSE) (c) Farhan
