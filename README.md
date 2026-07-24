@@ -2,7 +2,7 @@
 
   <img src="src-tauri/icons/icon.png" alt="Glance Logo" width="110" height="110" />
 
-# Glance (MVP)
+# Glance
 
 **Understand any complex paragraph, weird code snippet, or error message before your coffee gets cold.**
 
