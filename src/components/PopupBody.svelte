@@ -116,55 +116,6 @@
     height: 0;
   }
 
-  .mode-tabs-container {
-    display: flex;
-    gap: 3px;
-    padding: 3px;
-    background: rgba(0, 0, 0, 0.28);
-    border: 1px solid var(--border);
-    border-radius: 9px;
-    margin-bottom: 12px;
-    flex-shrink: 0;
-  }
-
-  .mode-tab {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-    padding: 5px 10px;
-    border-radius: 7px;
-    font-size: 11.5px;
-    font-weight: 500;
-    letter-spacing: 0.01em;
-    color: var(--text-secondary);
-    background: transparent;
-    border: 1px solid transparent;
-    cursor: pointer;
-    transition:
-      background 150ms ease,
-      color 150ms ease,
-      border-color 150ms ease,
-      box-shadow 150ms ease;
-  }
-
-  .mode-tab:hover {
-    color: var(--text-primary);
-  }
-
-  .mode-tab.active {
-    background: var(--surface);
-    color: var(--text-primary);
-    border-color: var(--border);
-    font-weight: 600;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
-  }
-
-  .mode-tab.active svg {
-    stroke: var(--accent);
-  }
-
   .chat-thread {
     display: flex;
     flex-direction: column;

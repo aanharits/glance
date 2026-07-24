@@ -401,15 +401,6 @@
     color: var(--text-primary);
   }
 
-  .mode-menu-item.active {
-    background: rgba(168, 85, 247, 0.15);
-    color: var(--text-primary);
-  }
-
-  .mode-menu-item.active svg {
-    stroke: var(--accent);
-  }
-
   .mode-info {
     display: flex;
     flex-direction: column;
