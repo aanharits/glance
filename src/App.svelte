@@ -22,6 +22,7 @@
   let errorText = $state("");
   let showThemePicker = $state(false);
   let showHistory = $state(false);
+  let isMinimized = $state(false);
   let currentText = $state("");
   let historyItems = $state([]);
   let currentThemeId = $state("midnight-purple");
@@ -74,7 +75,7 @@
 
   // Auto-resize window based on DOM height changes
   $effect(() => {
-    status; chatMessages.length; errorText; showThemePicker; showHistory;
+    status; chatMessages.length; errorText; showThemePicker; showHistory; isMinimized;
     tick().then(() => resizeToContent(mainEl));
   });
 
@@ -93,7 +94,19 @@
     errorText = "";
     showThemePicker = false;
     showHistory = false;
+    isMinimized = false;
     isWindowVisible = false;
+  }
+
+  function handleToggleMinimize() {
+    // Only allow minimize when there's content to show
+    if (status !== "result" && chatMessages.length === 0) return;
+    isMinimized = !isMinimized;
+    // Close panels when minimizing
+    if (isMinimized) {
+      showThemePicker = false;
+      showHistory = false;
+    }
   }
 
   async function handleClose() {
@@ -184,6 +197,7 @@
       {status}
       {showThemePicker}
       {showHistory}
+      {isMinimized}
       bind:headerEl
       onToggleTheme={() => {
         showThemePicker = !showThemePicker;
@@ -193,33 +207,36 @@
         showHistory = !showHistory;
         if (showHistory) showThemePicker = false;
       }}
+      onToggleMinimize={handleToggleMinimize}
       onClose={handleClose}
     />
 
-    {#if showThemePicker}
-      <ThemePicker
-        {currentThemeId}
-        {customColorHex}
-        onSelectPreset={selectPresetTheme}
-        onCustomColorInput={handleCustomColorInput}
-      />
-    {/if}
-
-    {#if showHistory}
-      <HistoryPanel
-        {historyItems}
-        onSelectHistoryItem={handleSelectHistoryItem}
-        onDeleteHistoryItem={handleDeleteHistoryItem}
-        onClearAllHistory={handleClearAllHistory}
-      />
-    {:else}
-      <PopupBody {status} messages={chatMessages} {errorText} />
-
-      {#if status === "result" || chatMessages.length > 0}
-        <FollowUpInput
-          disabled={status === "loading"}
-          onSubmitFollowUp={handleFollowUp}
+    {#if !isMinimized}
+      {#if showThemePicker}
+        <ThemePicker
+          {currentThemeId}
+          {customColorHex}
+          onSelectPreset={selectPresetTheme}
+          onCustomColorInput={handleCustomColorInput}
         />
+      {/if}
+
+      {#if showHistory}
+        <HistoryPanel
+          {historyItems}
+          onSelectHistoryItem={handleSelectHistoryItem}
+          onDeleteHistoryItem={handleDeleteHistoryItem}
+          onClearAllHistory={handleClearAllHistory}
+        />
+      {:else}
+        <PopupBody {status} messages={chatMessages} {errorText} />
+
+        {#if status === "result" || chatMessages.length > 0}
+          <FollowUpInput
+            disabled={status === "loading"}
+            onSubmitFollowUp={handleFollowUp}
+          />
+        {/if}
       {/if}
     {/if}
   </div>
