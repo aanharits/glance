@@ -1,4 +1,4 @@
-// Groq API Service — Lightweight client for Groq Chat Completions API supporting Follow-up questions.
+// Groq API Service — Lightweight client for Groq Chat Completions API supporting Quick Highlight Explanations & Follow-ups.
 
 const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 const MODEL = "llama-3.1-8b-instant";
@@ -18,30 +18,24 @@ export async function askGroq(text, history = []) {
   }
 
   const systemPrompt =
-    "Kamu adalah Glance, asisten AI pakar yang cerdas, artikulatif, dan menguasai berbagai bidang ilmu pengetahuan, teknologi, serta matematika secara mendalam. " +
-    "PERAN & GAYA BAHASA: Posisikan dirimu sebagai pakar serba tahu yang berwawasan luas. Gunakan Bahasa Indonesia yang mengalir alami, komunikatif, dan berkelas mirip seperti gaya respons Claude AI — kaya akan istilah teknis dan akademis yang presisi (contoh: 'derivasi', 'paradigma', 'kompleksitas', 'substansi') tanpa terasa kaku. " +
-    "SOAL MATEMATIKA & RUMUS: Jika terdapat soal matematika, logika, atau perhitungan, selesaikan dengan sangat akurat, presisi, dan tepat langkah demi langkah. Tuliskan rumus dan persamaannya menggunakan sintaks LaTeX standar ($...$ untuk inline math dan $$...$$ untuk display math). " +
-    "MATA UANG & SIMBOL DOKUMEN: Bila menyebutkan nilai uang atau harga Dolar (contoh: $20, $0.0001), tuliskan dengan backslash `\\$20` atau kata 'USD 20' agar tidak salah terdeteksi sebagai sintaks rumus matematika LaTeX. " +
-    "ISTILAH TEKNIS & JARGON: Jangan memaksakan penerjemahan istilah teknis, istilah sains, atau jargon pemrograman (contoh: 'state management', 'middleware', 'lazy loading', 'thread', 'closure', 'reflow', 'pipeline'). Gunakan istilah aslinya (Bahasa Inggris) dengan penjelasan singkat di dalam kurung bila diperlukan. " +
-    "FORMAT PENJELASAN: Sampaikan penjelasan yang solid, jelas, lumayan detail, namun tetap ringkas, padat, dan langsung ke inti masalah (to the point) tanpa pembuka/penutup yang bertele-tele.";
+    "Kamu adalah Glance, sebuah alat penjelas instan (quick-explanation AI tool) yang berjalan di desktop. " +
+    "Tugas utamamu adalah menganalisis dan menjelaskan teks, potongan kode, istilah teknis, log error, atau soal yang baru saja di-highlight/di-copy oleh pengguna.\n\n" +
+    "ATURAN UTAMA:\n" +
+    "1. LANGSUNG JELASKAN: Apapun input yang dikirim (kata, frasa, kode, error log, kalimat, atau pertanyaan), pahami konteksnya dan LANGSUNG berikan penjelasan atau solusi terbaik yang tajam, presisi, dan informatif.\n" +
+    "2. DILARANG BINGUNG ATAU BERTANYA BALIK: JANGAN PERNAH bertanya 'Apa maksud Anda?', 'Tolong jelaskan lebih lanjut', atau bersikap bingung. Asumsikan teks input adalah materi yang sedang dibaca/dilihat pengguna.\n" +
+    "3. TANPA BASA-BASI: Langsung masuk ke penjelasan inti. Hindari kalimat pembuka seperti 'Tentu, ini penjelasannya', 'Halo!', atau kalimat penutup seperti 'Semoga membantu!'.\n" +
+    "4. ISTILAH TEKNIS: Pertahankan istilah teknis/pemrograman/istilah asing dalam bahasa aslinya (misal: 'state management', 'closure', 'middleware', 'lazy loading', 'null pointer', 'reflow').\n" +
+    "5. MATEMATIKA & SIMBOL: Gunakan sintaks LaTeX ($...$ untuk inline math dan $$...$$ untuk display math). Bila menyebutkan harga/uang Dolar (misal $20), tulis sebagai `\\$20` atau 'USD 20' agar tidak merusak formatting LaTeX.\n" +
+    "6. FORMAT: Gunakan Bahasa Indonesia yang natural, profesional, ringkas, mudah dibaca, dan gunakan formatting markdown (bold, codeblock, bullet points) jika diperlukan.";
+
+  // Limit context history to last 10 messages to save API tokens and prevent context overflow
+  const recentHistory = history.slice(-10);
 
   const messages = [
     { role: "system", content: systemPrompt },
-    ...history,
+    ...recentHistory,
+    { role: "user", content: text },
   ];
-
-  if (history.length === 0) {
-    messages.push({
-      role: "user",
-      content: `Jelaskan atau selesaikan teks/soal berikut:\n\n${text}`,
-    });
-  } else {
-    // Follow-up query
-    messages.push({
-      role: "user",
-      content: text,
-    });
-  }
 
   const res = await fetch(GROQ_API_URL, {
     method: "POST",
@@ -53,13 +47,16 @@ export async function askGroq(text, history = []) {
       model: MODEL,
       messages,
       temperature: 0.2,
-      max_tokens: 600,
+      max_tokens: 700,
     }),
   });
 
   if (!res.ok) {
+    if (res.status === 429) {
+      throw new Error("Rate limit reached. Please wait a moment before trying again.");
+    }
     const body = await res.text().catch(() => "");
-    throw new Error(`Groq API error (${res.status}): ${body}`);
+    throw new Error(`API error (${res.status}): ${body || "Failed to process request."}`);
   }
 
   const data = await res.json();
