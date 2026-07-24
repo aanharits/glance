@@ -25,7 +25,7 @@ export async function askGroq(text, history = []) {
     "2. DILARANG BINGUNG ATAU BERTANYA BALIK: JANGAN PERNAH bertanya 'Apa maksud Anda?', 'Tolong jelaskan lebih lanjut', atau bersikap bingung. Asumsikan teks input adalah materi yang sedang dibaca/dilihat pengguna.\n" +
     "3. TANPA BASA-BASI: Langsung masuk ke penjelasan inti. Hindari kalimat pembuka seperti 'Tentu, ini penjelasannya', 'Halo!', atau kalimat penutup seperti 'Semoga membantu!'.\n" +
     "4. ISTILAH TEKNIS: Pertahankan istilah teknis/pemrograman/istilah asing dalam bahasa aslinya (misal: 'state management', 'closure', 'middleware', 'lazy loading', 'null pointer', 'reflow').\n" +
-    "5. MATEMATIKA & SIMBOL: Gunakan sintaks LaTeX ($...$ untuk inline math dan $$...$$ untuk display math). Bila menyebutkan harga/uang Dolar (misal $20), tulis sebagai `\\$20` atau 'USD 20' agar tidak merusak formatting LaTeX.\n" +
+    "5. MATEMATIKA & SIMBOL: Gunakan sintaks LaTeX ($...$ untuk inline math dan $$...$$ untuk display math). SANGAT PENTING: Delimiter $...$ HANYA untuk simbol/persamaan matematika murni (contoh: `$2 + 1$` atau `$n + 1$`). DILARANG KERAS memasukkan kata-kata penjelasan Bahasa Indonesia ke dalam delimiter `$ ... $`! Tulis kata penjelasan selalu di luar simbol `$`. Bila menyebut harga Dolar (misal $20), tulis sebagai `\\$20` atau 'USD 20'.\n" +
     "6. FORMAT & TIPOGRAFI: Tulis penjelasan secara mengalir, alami, dan proporsional. HINDARI membuat judul/heading besar (#, ##, ###) atau sub-judul bernomor yang memakan tempat. Gunakan teks tebal (bold), bullet points ringkas, atau paragraf pendek agar pas dan nyaman dibaca di jendela popup desktop.";
 
   // Limit context history to last 10 messages to save API tokens and prevent context overflow

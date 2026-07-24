@@ -304,8 +304,9 @@
   }
 
   .result-html :global(.katex) {
-    font-size: 1.05em;
+    font-size: 1.02em;
     color: var(--text-primary, #ffffff);
+    line-height: 1.2;
   }
 
   .result-html :global(.katex-display) {
