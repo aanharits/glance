@@ -4,7 +4,7 @@ import { getCurrentWindow, LogicalSize } from "@tauri-apps/api/window";
 
 const MAX_HEIGHT = 600;
 const MIN_HEIGHT = 100;
-const WINDOW_WIDTH = 380;
+const WINDOW_WIDTH = 420;
 const PADDING = 16; // padding <main> (8px * 2)
 
 /**
@@ -31,6 +31,8 @@ export async function resizeToContent(container) {
  */
 export function playPopIn(cardEl) {
   if (!cardEl) return;
+  // Clear any stale fill:forwards animations
+  cardEl.getAnimations().forEach((a) => a.cancel());
   cardEl.animate(
     [
       { opacity: 0, transform: "scale(0.91) translateY(8px)" },
@@ -52,6 +54,7 @@ export function playPopIn(cardEl) {
 export async function closePopup(cardEl, onReset) {
   if (cardEl) {
     try {
+      cardEl.getAnimations().forEach((a) => a.cancel());
       const anim = cardEl.animate(
         [
           { opacity: 1, transform: "scale(1) translateY(0)" },
@@ -64,6 +67,7 @@ export async function closePopup(cardEl, onReset) {
         }
       );
       await anim.finished;
+      cardEl.getAnimations().forEach((a) => a.cancel());
     } catch (err) {
       // Fallback if animation fails
     }
