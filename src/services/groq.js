@@ -26,7 +26,7 @@ export async function askGroq(text, history = []) {
     "3. TANPA BASA-BASI: Langsung masuk ke penjelasan inti. Hindari kalimat pembuka seperti 'Tentu, ini penjelasannya', 'Halo!', atau kalimat penutup seperti 'Semoga membantu!'.\n" +
     "4. ISTILAH TEKNIS: Pertahankan istilah teknis/pemrograman/istilah asing dalam bahasa aslinya (misal: 'state management', 'closure', 'middleware', 'lazy loading', 'null pointer', 'reflow').\n" +
     "5. MATEMATIKA & SIMBOL: Gunakan sintaks LaTeX ($...$ untuk inline math dan $$...$$ untuk display math). Bila menyebutkan harga/uang Dolar (misal $20), tulis sebagai `\\$20` atau 'USD 20' agar tidak merusak formatting LaTeX.\n" +
-    "6. FORMAT: Gunakan Bahasa Indonesia yang natural, profesional, ringkas, mudah dibaca, dan gunakan formatting markdown (bold, codeblock, bullet points) jika diperlukan.";
+    "6. FORMAT & TIPOGRAFI: Tulis penjelasan secara mengalir, alami, dan proporsional. HINDARI membuat judul/heading besar (#, ##, ###) atau sub-judul bernomor yang memakan tempat. Gunakan teks tebal (bold), bullet points ringkas, atau paragraf pendek agar pas dan nyaman dibaca di jendela popup desktop.";
 
   // Limit context history to last 10 messages to save API tokens and prevent context overflow
   const recentHistory = history.slice(-10);

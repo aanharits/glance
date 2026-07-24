@@ -217,6 +217,33 @@
     word-break: break-word;
   }
 
+  .result-html :global(h1) {
+    font-size: 15px;
+    font-weight: 700;
+    margin: 10px 0 6px 0;
+    color: var(--text-primary);
+    line-height: 1.35;
+  }
+
+  .result-html :global(h2) {
+    font-size: 14px;
+    font-weight: 650;
+    margin: 8px 0 4px 0;
+    color: var(--text-primary);
+    line-height: 1.35;
+  }
+
+  .result-html :global(h3),
+  .result-html :global(h4),
+  .result-html :global(h5),
+  .result-html :global(h6) {
+    font-size: 13.5px;
+    font-weight: 600;
+    margin: 8px 0 4px 0;
+    color: var(--text-primary);
+    line-height: 1.35;
+  }
+
   .result-html :global(p) {
     margin: 0 0 10px 0;
   }
