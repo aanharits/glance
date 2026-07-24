@@ -1,4 +1,4 @@
-name: "Publish Multi-Platform Release"
+name: "Publish GitHub Release"
 
 on:
   push:
@@ -15,8 +15,8 @@ jobs:
         include:
           - platform: "macos-latest"
             args: "--target universal-apple-darwin"
-          - platform: "windows-latest"
-            args: ""
+          # - platform: "windows-latest" # Uncomment in v0.2.0 when Windows tray support is complete
+          #   args: ""
 
     runs-on: ${{ matrix.platform }}
 
@@ -42,9 +42,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tagName: v__VERSION__
-          releaseName: "Glance v__VERSION__"
-          releaseBody: "See the assets below to download the Glance installer for your operating system."
-          releaseDraft: true
+          tagName: ${{ github.ref_name }}
+          releaseName: "Glance ${{ github.ref_name }}"
+          releaseBody: "See the assets below to download the Glance installer (.dmg) for macOS."
+          releaseDraft: false
           prerelease: false
           args: ${{ matrix.args }}
