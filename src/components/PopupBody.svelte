@@ -288,6 +288,52 @@
     padding: 6px 0;
   }
 
+  /* Markdown Table Styling */
+  .result-html :global(table) {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0;
+    font-size: 12.5px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background: rgba(0, 0, 0, 0.25);
+  }
+
+  .result-html :global(th) {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-primary);
+    font-weight: 600;
+    text-align: left;
+    padding: 7px 10px;
+    border-bottom: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+  }
+
+  .result-html :global(th:last-child) {
+    border-right: none;
+  }
+
+  .result-html :global(td) {
+    padding: 6px 10px;
+    color: var(--text-primary);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    border-right: 1px solid rgba(255, 255, 255, 0.06);
+    word-break: break-word;
+  }
+
+  .result-html :global(td:last-child) {
+    border-right: none;
+  }
+
+  .result-html :global(tr:last-child td) {
+    border-bottom: none;
+  }
+
+  .result-html :global(tr:nth-child(even)) {
+    background: rgba(255, 255, 255, 0.03);
+  }
+
   .error-text {
     font-size: 13px;
     color: #ef4444;
