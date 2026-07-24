@@ -106,7 +106,7 @@ Why waste mental bandwidth decoding dense text or complex code? **Glance** handl
 - **Tray-Anchored Popup**: Appears seamlessly under your macOS menu bar tray icon.
 - **Rich Markdown & LaTeX Rendering**: Full support for bold/italic typography, inline code blocks, formatted lists, and LaTeX math formulas (`$...$` and `$$...$$` rendered via KaTeX).
 - **Multi-Turn Roomchat Session**: Ask follow-up questions or paste multiple snippets into the same roomchat without creating duplicate history entries.
-- **Keyboard-First Design**: Press `Esc` to close, `Cmd+C` to copy text.
+- **Keyboard Shortcuts**: Press `Cmd+Shift+S` to open/toggle-close Glance, `Cmd+Shift+M` to minimize/expand window height, and `Esc` to close when focused.
 
 ---
 
@@ -119,7 +119,7 @@ Why waste mental bandwidth decoding dense text or complex code? **Glance** handl
 3. **Highlight & Copy (`Cmd+C`)**: Select any confusing text, code snippet, math formula, or error message anywhere on your screen (Browser, IDE, PDF, Terminal, Slack) and press **`Cmd+C`**.
 4. **Auto AI Analysis & Follow-Up**: Glance automatically detects the new copy event while open, streams a clear ELI5 explanation or TL;DR summary, and lets you type follow-up questions in the input box at the bottom.
 5. **New Chat (`+`)**: Click the **`+` (Plus)** button in the header to start a fresh roomchat at any time.
-6. **Dismiss (`Esc`)**: Press **`Esc`** (or click away) to close the window.
+6. **Dismiss (`Cmd+Shift+S` or `Esc`)**: Press **`Cmd+Shift+S`** anywhere to toggle-close Glance, or press **`Esc`** (when Glance window is focused).
 
 ### 2. Vision Mode (Drag & Select Screenshot) — _In Development_
 

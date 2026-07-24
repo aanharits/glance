@@ -58,6 +58,8 @@
   let unlistenTheme = null;
   /** @type {(() => void) | null} */
   let unlistenClip = null;
+  /** @type {(() => void) | null} */
+  let unlistenMin = null;
 
   onMount(async () => {
     const loaded = await loadTheme();
@@ -71,6 +73,7 @@
       "theme:changed",
       (e) => e.payload && selectPresetTheme(e.payload),
     );
+    unlistenMin = await listen("window:toggle_minimize", handleToggleMinimize);
 
     // Native OS clipboard listener emitted by Rust background thread
     // 100% event-driven: zero CPU & RAM overhead from JS setInterval polling
@@ -92,6 +95,7 @@
     if (unlistenSnap) unlistenSnap();
     if (unlistenTheme) unlistenTheme();
     if (unlistenClip) unlistenClip();
+    if (unlistenMin) unlistenMin();
   });
 
   // Attach native window drag handle
@@ -180,7 +184,12 @@
   }
 
   function handleKeydown(e) {
-    if (e.key === "Escape") handleClose();
+    if (e.key === "Escape") {
+      handleClose();
+    } else if ((e.metaKey || e.ctrlKey) && (e.key === "m" || e.key === "M")) {
+      e.preventDefault();
+      handleToggleMinimize();
+    }
   }
 
   function handleSelectMode(mode) {

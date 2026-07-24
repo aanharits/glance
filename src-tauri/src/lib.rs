@@ -39,11 +39,31 @@ fn setup_mac_window_spaces_behavior(window: &tauri::WebviewWindow) {
     }
 }
 
+#[cfg(target_os = "macos")]
+fn make_window_key_and_focus(window: &tauri::WebviewWindow) {
+    use objc::{msg_send, sel, sel_impl};
+    if let Ok(ns_win_ptr) = window.ns_window() {
+        let ns_win = ns_win_ptr as *mut objc::runtime::Object;
+        if !ns_win.is_null() {
+            unsafe {
+                // Force Cocoa NSWindow to become key window instantly so Esc works without clicking
+                let _: () = msg_send![ns_win, makeKeyAndOrderFront: 0usize];
+            }
+        }
+    }
+}
+
 // Main trigger: positions popup window anchored directly at Glance tray icon area.
 fn trigger_snap(app: &tauri::AppHandle) {
     let Some(window) = app.get_webview_window("popup") else {
         return;
     };
+
+    // Toggle close if window is already visible and focused
+    if window.is_visible().unwrap_or(false) && window.is_focused().unwrap_or(false) {
+        let _ = window.hide();
+        return;
+    }
 
     #[cfg(target_os = "macos")]
     setup_mac_window_spaces_behavior(&window);
@@ -81,6 +101,9 @@ fn trigger_snap(app: &tauri::AppHandle) {
 
     let _ = window.show();
     let _ = window.set_focus();
+
+    #[cfg(target_os = "macos")]
+    make_window_key_and_focus(&window);
 
     let _ = window.emit("snap:triggered", ());
 }
@@ -202,13 +225,25 @@ pub fn run() {
                 })
                 .build(app)?;
 
-            // --- Global shortcut: Cmd/Ctrl+Shift+S ---
-            let shortcut = Shortcut::new(Some(Modifiers::SHIFT | Modifiers::SUPER), Code::KeyS);
-            let handle = app.handle().clone();
+            // --- Global shortcut: Cmd/Ctrl+Shift+S (Open/Toggle Glance) ---
+            let shortcut_s = Shortcut::new(Some(Modifiers::SHIFT | Modifiers::SUPER), Code::KeyS);
+            let handle_s = app.handle().clone();
 
-            app.global_shortcut().on_shortcut(shortcut, move |_app, _shortcut, event| {
+            app.global_shortcut().on_shortcut(shortcut_s, move |_app, _shortcut, event| {
                 if event.state() == ShortcutState::Pressed {
-                    trigger_snap(&handle);
+                    trigger_snap(&handle_s);
+                }
+            })?;
+
+            // --- Global shortcut: Cmd/Ctrl+Shift+M (Toggle Minimize/Expand) ---
+            let shortcut_m = Shortcut::new(Some(Modifiers::SHIFT | Modifiers::SUPER), Code::KeyM);
+            let handle_m = app.handle().clone();
+
+            app.global_shortcut().on_shortcut(shortcut_m, move |_app, _shortcut, event| {
+                if event.state() == ShortcutState::Pressed {
+                    if let Some(window) = handle_m.get_webview_window("popup") {
+                        let _ = window.emit("window:toggle_minimize", ());
+                    }
                 }
             })?;
 
