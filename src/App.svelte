@@ -1,13 +1,24 @@
 <script>
   import "./app.css";
   import { onMount, onDestroy, tick } from "svelte";
+  import { slide } from "svelte/transition";
   import { listen } from "@tauri-apps/api/event";
   import { syncClipboardBaseline, checkNewCopy } from "./services/clipboard.js";
   import { askGroq } from "./services/groq.js";
-  import { resizeToContent, closePopup, playPopIn } from "./services/window.js";
+  import {
+    resizeToContent,
+    closePopup,
+    playPopIn,
+    resizeToHeight,
+  } from "./services/window.js";
   import { setupWindowDrag } from "./services/drag.js";
   import { saveTheme, loadTheme } from "./services/theme.js";
-  import { getHistory, saveHistory, deleteHistoryItem, clearHistory } from "./services/history.js";
+  import {
+    getHistory,
+    saveHistory,
+    deleteHistoryItem,
+    clearHistory,
+  } from "./services/history.js";
 
   // UI Components
   import PopupHeader from "./components/PopupHeader.svelte";
@@ -23,6 +34,8 @@
   let showThemePicker = $state(false);
   let showHistory = $state(false);
   let isMinimized = $state(false);
+  let savedFullHeight = $state(0); // stores window height before minimizing
+  let currentSessionId = $state(null); // stores active roomchat session ID
   let currentText = $state("");
   let historyItems = $state([]);
   let currentThemeId = $state("midnight-purple");
@@ -49,7 +62,10 @@
     historyItems = await getHistory();
 
     unlistenSnap = await listen("snap:triggered", handleSnap);
-    unlistenTheme = await listen("theme:changed", (e) => e.payload && selectPresetTheme(e.payload));
+    unlistenTheme = await listen(
+      "theme:changed",
+      (e) => e.payload && selectPresetTheme(e.payload),
+    );
 
     // Monitor clipboard for new copy events ONLY when window is visible
     clipboardInterval = setInterval(async () => {
@@ -73,9 +89,13 @@
     if (headerEl && cardEl) return setupWindowDrag(headerEl, cardEl);
   });
 
-  // Auto-resize window based on DOM height changes
+  // Auto-resize window based on DOM height changes (instant for all except minimize toggle)
   $effect(() => {
-    status; chatMessages.length; errorText; showThemePicker; showHistory; isMinimized;
+    status;
+    chatMessages.length;
+    errorText;
+    showThemePicker;
+    showHistory;
     tick().then(() => resizeToContent(mainEl));
   });
 
@@ -91,6 +111,7 @@
   function resetState() {
     status = "idle";
     chatMessages = [];
+    currentSessionId = null;
     errorText = "";
     showThemePicker = false;
     showHistory = false;
@@ -98,14 +119,36 @@
     isWindowVisible = false;
   }
 
-  function handleToggleMinimize() {
+  function handleNewChat() {
+    status = "idle";
+    chatMessages = [];
+    currentSessionId = null;
+    errorText = "";
+    showThemePicker = false;
+    showHistory = false;
+    isMinimized = false;
+  }
+
+  async function handleToggleMinimize() {
     // Only allow minimize when there's content to show
     if (status !== "result" && chatMessages.length === 0) return;
-    isMinimized = !isMinimized;
-    // Close panels when minimizing
-    if (isMinimized) {
+
+    if (!isMinimized) {
+      // MINIMIZING: capture current height, then collapse
+      const rawHeight = Math.max(mainEl.scrollHeight, mainEl.offsetHeight) + 16;
+      savedFullHeight = Math.max(100, Math.min(rawHeight, 600));
+      isMinimized = true;
       showThemePicker = false;
       showHistory = false;
+      // Wait for slide-out animation (220ms) to finish, then shrink window
+      setTimeout(() => resizeToContent(mainEl), 240);
+    } else {
+      // EXPANDING: pre-size window to full height first so slide-in has room
+      if (savedFullHeight > 0) {
+        await resizeToHeight(savedFullHeight);
+      }
+      // Then reveal content — slide-in animation plays inside the already-sized window
+      isMinimized = false;
     }
   }
 
@@ -134,16 +177,41 @@
     if (!text) return;
     try {
       currentText = text;
-      status = "loading";
 
-      const res = await askGroq(text);
-      chatMessages = [{ role: "assistant", content: res }];
-      status = "result";
+      if (!currentSessionId || status === "idle" || chatMessages.length === 0) {
+        // Start a brand new session
+        currentSessionId = Date.now().toString();
+        status = "loading";
+        const res = await askGroq(text);
+        chatMessages = [
+          { role: "user", content: text },
+          { role: "assistant", content: res },
+        ];
+        status = "result";
 
-      historyItems = await saveHistory({
-        inputText: text,
-        resultText: res,
-      });
+        historyItems = await saveHistory({
+          id: currentSessionId,
+          inputText: text,
+          resultText: res,
+          messages: chatMessages,
+        });
+      } else {
+        // Append to existing active roomchat session
+        const previousHistory = [...chatMessages];
+        chatMessages = [...chatMessages, { role: "user", content: text }];
+        status = "loading";
+
+        const res = await askGroq(text, previousHistory);
+        chatMessages = [...chatMessages, { role: "assistant", content: res }];
+        status = "result";
+
+        historyItems = await saveHistory({
+          id: currentSessionId,
+          inputText: text,
+          resultText: res,
+          messages: chatMessages,
+        });
+      }
     } catch (err) {
       console.error("Glance error:", err);
       errorText = err?.message || "Failed to process. Please try again.";
@@ -154,6 +222,9 @@
   async function handleFollowUp(prompt) {
     if (chatMessages.length === 0) return;
     try {
+      if (!currentSessionId) {
+        currentSessionId = Date.now().toString();
+      }
       const previousHistory = [...chatMessages];
       chatMessages = [...chatMessages, { role: "user", content: prompt }];
       status = "loading";
@@ -163,8 +234,10 @@
       status = "result";
 
       historyItems = await saveHistory({
+        id: currentSessionId,
         inputText: prompt,
         resultText: res,
+        messages: chatMessages,
       });
     } catch (err) {
       console.error("Follow-up error:", err);
@@ -174,10 +247,14 @@
   }
 
   async function handleSelectHistoryItem(item) {
-    chatMessages = [{ role: "assistant", content: item.resultText }];
+    currentSessionId = item.id;
+    chatMessages = item.messages && item.messages.length > 0
+      ? item.messages
+      : [{ role: "assistant", content: item.resultText }];
     currentText = item.inputText || "";
     status = "result";
     showHistory = false;
+    isMinimized = false;
   }
 
   async function handleDeleteHistoryItem(id) {
@@ -208,36 +285,68 @@
         if (showHistory) showThemePicker = false;
       }}
       onToggleMinimize={handleToggleMinimize}
+      onNewChat={handleNewChat}
       onClose={handleClose}
     />
 
     {#if !isMinimized}
-      {#if showThemePicker}
-        <ThemePicker
-          {currentThemeId}
-          {customColorHex}
-          onSelectPreset={selectPresetTheme}
-          onCustomColorInput={handleCustomColorInput}
-        />
-      {/if}
-
-      {#if showHistory}
-        <HistoryPanel
-          {historyItems}
-          onSelectHistoryItem={handleSelectHistoryItem}
-          onDeleteHistoryItem={handleDeleteHistoryItem}
-          onClearAllHistory={handleClearAllHistory}
-        />
-      {:else}
-        <PopupBody {status} messages={chatMessages} {errorText} />
-
-        {#if status === "result" || chatMessages.length > 0}
-          <FollowUpInput
-            disabled={status === "loading"}
-            onSubmitFollowUp={handleFollowUp}
+      <div
+        transition:slide={{ duration: 220, axis: "y" }}
+        class="card-body-wrapper"
+      >
+        {#if showThemePicker}
+          <ThemePicker
+            {currentThemeId}
+            {customColorHex}
+            onSelectPreset={selectPresetTheme}
+            onCustomColorInput={handleCustomColorInput}
           />
         {/if}
-      {/if}
+
+        {#if showHistory}
+          <HistoryPanel
+            {historyItems}
+            onSelectHistoryItem={handleSelectHistoryItem}
+            onDeleteHistoryItem={handleDeleteHistoryItem}
+            onClearAllHistory={handleClearAllHistory}
+          />
+        {:else}
+          <PopupBody {status} messages={chatMessages} {errorText} />
+
+          {#if status === "result" || chatMessages.length > 0}
+            <FollowUpInput
+              disabled={status === "loading"}
+              onSubmitFollowUp={handleFollowUp}
+            />
+          {/if}
+        {/if}
+      </div>
+    {/if}
+
+    {#if status === "result" || chatMessages.length > 0}
+      <button
+        class="collapse-bar"
+        onclick={handleToggleMinimize}
+        data-no-drag
+        aria-label={isMinimized ? "Expand" : "Minimize"}
+      >
+        <svg
+          width="12"
+          height="12"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+        >
+          {#if isMinimized}
+            <path d="M5 12h14M12 5l7 7-7 7" />
+          {:else}
+            <path d="M5 12h14" />
+          {/if}
+        </svg>
+        <span>{isMinimized ? "Expand" : "Minimize"}</span>
+      </button>
     {/if}
   </div>
 </main>
@@ -257,11 +366,18 @@
     border: 1px solid var(--border);
     border-radius: var(--radius);
     box-shadow: var(--glass-shadow);
-    max-width: 360px;
+    max-width: 370px;
     display: flex;
     flex-direction: column;
     will-change: opacity, transform;
-    transition: box-shadow 200ms ease, border-color 200ms ease;
+    transition:
+      box-shadow 200ms ease,
+      border-color 200ms ease;
+    overflow: hidden;
+  }
+
+  .card-body-wrapper {
+    overflow: hidden;
   }
 
   /* Tray Arrow Indicator pointing up to system tray icon */
@@ -282,7 +398,38 @@
   }
 
   :global(.card.dragging) {
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18), 0 4px 12px rgba(0, 0, 0, 0.08);
+    box-shadow:
+      0 12px 40px rgba(0, 0, 0, 0.18),
+      0 4px 12px rgba(0, 0, 0, 0.08);
     border-color: rgba(255, 255, 255, 0.18);
+  }
+
+  .collapse-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    width: 100%;
+    padding: 7px 12px;
+    background-color: var(--bg-solid);
+    background-image: var(--theme-tint-bg);
+    background-size: 200% 200%;
+    opacity: 0.82;
+    border: none;
+    border-top: 1px solid var(--border);
+    border-radius: 0 0 var(--radius) var(--radius);
+    color: var(--text-secondary);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    transition:
+      opacity 150ms ease,
+      color 150ms ease;
+  }
+
+  .collapse-bar:hover {
+    opacity: 1;
+    color: var(--text-primary);
   }
 </style>
