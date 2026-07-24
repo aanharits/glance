@@ -115,9 +115,9 @@ Glance is 100% local-first and privacy-respecting. All session histories are sto
 
 | Operating System | Storage Path | Status |
 | :--- | :--- | :--- |
-| **macOS** | `~/Library/Application Support/id.aan.glance/history.json` | Active |
-| **Windows** | `%APPDATA%\id.aan.glance\history.json` | Coming Soon |
-| **Linux** | `~/.config/id.aan.glance/history.json` | Coming Soon |
+| **macOS** | `~/Library/Application Support/id.glance/history.json` | Active |
+| **Windows** | `%APPDATA%\id.glance\history.json` | Coming Soon |
+| **Linux** | `~/.config/id.glance/history.json` | Coming Soon |
 
 ### Smart Memory & Token Safeguards
 
