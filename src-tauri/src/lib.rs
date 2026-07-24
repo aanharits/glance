@@ -5,7 +5,7 @@ use tauri::{
 };
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
 
-// Main trigger: positions popup window near macOS Menu Bar (top-right) or Windows System Tray (bottom-right).
+// Main trigger: positions popup window anchored directly at Glance tray icon area.
 fn trigger_snap(app: &tauri::AppHandle) {
     let Some(window) = app.get_webview_window("popup") else {
         return;
@@ -17,17 +17,17 @@ fn trigger_snap(app: &tauri::AppHandle) {
         let window_width = 380.0 * scale_factor;
 
         let (x, y) = if cfg!(target_os = "macos") {
-            // macOS: Top-right under menu bar
-            let right_offset = 180.0 * scale_factor;
-            let top_offset = 38.0 * scale_factor;
-            let x_pos = (monitor_size.width as f64 - window_width - right_offset).max(12.0);
+            // macOS: Aligned under the Glance menu bar tray icon (◎)
+            let right_margin = 130.0 * scale_factor;
+            let top_offset = 44.0 * scale_factor;
+            let x_pos = (monitor_size.width as f64 - window_width - right_margin).max(12.0);
             let y_pos = top_offset;
             (x_pos, y_pos)
         } else {
-            // Windows / Linux: Bottom-right above taskbar system tray
-            let right_offset = 16.0 * scale_factor;
-            let bottom_offset = 70.0 * scale_factor;
-            let x_pos = (monitor_size.width as f64 - window_width - right_offset).max(12.0);
+            // Windows / Linux: Aligned above the Glance system tray icon (◎)
+            let right_margin = 20.0 * scale_factor;
+            let bottom_offset = 60.0 * scale_factor;
+            let x_pos = (monitor_size.width as f64 - window_width - right_margin).max(12.0);
 
             let window_height = if let Ok(size) = window.outer_size() {
                 size.height as f64
@@ -58,11 +58,6 @@ pub fn run() {
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .plugin(tauri_plugin_store::Builder::new().build())
-        .on_window_event(|window, event| {
-            if let tauri::WindowEvent::Focused(false) = event {
-                let _ = window.hide();
-            }
-        })
         .setup(|app| {
             // Hide dock icon — app runs exclusively as an Accessory item in tray
             #[cfg(target_os = "macos")]
