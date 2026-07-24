@@ -1,43 +1,29 @@
-// Clipboard Service — Tracks clipboard changes to handle instant copy analysis.
+// Clipboard Service — Active-gated clipboard manager.
+// Ensures old clipboard data copied while Glance was closed is NEVER processed.
 
 import { readText } from "@tauri-apps/plugin-clipboard-manager";
 
 let lastProcessedText = "";
 
 /**
- * Gets the last processed clipboard text string.
- * @returns {string}
+ * Syncs current system clipboard as baseline when Glance opens.
+ * Any text copied BEFORE opening Glance will be marked as baseline and IGNORED.
  */
-export function getLastProcessedText() {
-  return lastProcessedText;
-}
-
-/**
- * Manually updates last processed text string.
- * @param {string} text
- */
-export function setLastProcessedText(text) {
-  if (text) lastProcessedText = text.trim();
-}
-
-/**
- * Reads current text from clipboard directly.
- * @returns {Promise<string|null>}
- */
-export async function getClipboardText() {
+export async function syncClipboardBaseline() {
   try {
     const text = await readText();
     if (text && text.trim().length > 0) {
-      return text.trim();
+      lastProcessedText = text.trim();
+    } else {
+      lastProcessedText = "";
     }
   } catch (err) {
-    console.warn("Failed to read clipboard:", err);
+    lastProcessedText = "";
   }
-  return null;
 }
 
 /**
- * Checks if new text was copied to system clipboard.
+ * Checks if new text was copied to system clipboard while Glance is open.
  * Returns new text string if copied, or null if unchanged.
  * @returns {Promise<string|null>}
  */
@@ -51,8 +37,14 @@ export async function checkNewCopy() {
         return trimmed;
       }
     }
-  } catch (err) {
-    console.warn("Failed to check clipboard copy:", err);
-  }
+  } catch (err) {}
   return null;
+}
+
+/**
+ * Manually sets last processed baseline text.
+ * @param {string} text
+ */
+export function setLastProcessedText(text) {
+  lastProcessedText = text ? text.trim() : "";
 }

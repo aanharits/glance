@@ -5,9 +5,7 @@
   import { listen } from "@tauri-apps/api/event";
   import {
     checkNewCopy,
-    getClipboardText,
-    getLastProcessedText,
-    setLastProcessedText,
+    syncClipboardBaseline,
   } from "./services/clipboard.js";
   import { askGroq } from "./services/groq.js";
   import {
@@ -72,7 +70,7 @@
       (e) => e.payload && selectPresetTheme(e.payload),
     );
 
-    // Monitor clipboard for new copy events ONLY when window is visible
+    // Monitor clipboard for new copy events ONLY when Glance window is actively visible
     clipboardInterval = setInterval(async () => {
       if (!isWindowVisible) return;
 
@@ -80,7 +78,7 @@
       if (newText) {
         doCapture(newText);
       }
-    }, 400);
+    }, 250);
   });
 
   onDestroy(() => {
@@ -106,18 +104,11 @@
 
   async function handleSnap() {
     isWindowVisible = true;
+    // Sync current clipboard as baseline so text copied BEFORE opening Glance is NEVER processed
+    await syncClipboardBaseline();
+
     await tick();
     if (cardEl) playPopIn(cardEl);
-
-    // Instantly check and process current clipboard text when shortcut/tray is triggered
-    const currentClip = await getClipboardText();
-    if (currentClip) {
-      const last = getLastProcessedText();
-      if (currentClip !== last || status === "idle") {
-        setLastProcessedText(currentClip);
-        await doCapture(currentClip);
-      }
-    }
   }
 
   function resetState() {
@@ -129,7 +120,6 @@
     showHistory = false;
     isMinimized = false;
     isWindowVisible = false;
-    setLastProcessedText("");
   }
 
   function handleNewChat() {
@@ -140,7 +130,6 @@
     showThemePicker = false;
     showHistory = false;
     isMinimized = false;
-    setLastProcessedText("");
   }
 
   async function handleToggleMinimize() {
