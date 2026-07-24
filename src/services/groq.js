@@ -14,7 +14,7 @@ export async function askGroq(text, history = [], mode = "explain") {
   const apiKey = import.meta.env.VITE_GROQ_API_KEY;
   if (!apiKey) {
     throw new Error(
-      "Groq API key missing. Run dev server with: VITE_GROQ_API_KEY=gsk_xxx npm run tauri dev"
+      "Groq API key is missing. Please ensure VITE_GROQ_API_KEY is configured."
     );
   }
 
