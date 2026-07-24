@@ -1,9 +1,15 @@
-// History Service — Manages local history of recent snaps using tauri-plugin-store.
+// History Service — Manages local history of recent snap chat sessions using tauri-plugin-store.
 
 import { LazyStore } from "@tauri-apps/plugin-store";
 
 const store = new LazyStore("history.json");
 const MAX_HISTORY = 20;
+
+/**
+ * @typedef {Object} HistoryMessage
+ * @property {string} role - 'user' | 'assistant'
+ * @property {string} content
+ */
 
 /**
  * @typedef {Object} HistoryItem
@@ -12,6 +18,7 @@ const MAX_HISTORY = 20;
  * @property {string} mode
  * @property {string} inputText
  * @property {string} resultText
+ * @property {HistoryMessage[]} [messages]
  */
 
 /**
@@ -21,7 +28,11 @@ const MAX_HISTORY = 20;
 export async function getHistory() {
   try {
     const list = await store.get("items");
-    return Array.isArray(list) ? list : [];
+    if (!Array.isArray(list)) return [];
+    return list.map((item) => ({
+      ...item,
+      messages: item.messages || [{ role: "assistant", content: item.resultText }],
+    }));
   } catch (err) {
     console.warn("Failed to load history from store:", err);
     return [];
@@ -29,35 +40,56 @@ export async function getHistory() {
 }
 
 /**
- * Saves a new snap result to history.
- * @param {object} item
- * @param {string} item.mode
- * @param {string} item.inputText
- * @param {string} item.resultText
+ * Saves or updates a session in history.
+ * @param {object} param
+ * @param {string} param.id - Session ID
+ * @param {string} [param.mode]
+ * @param {string} [param.inputText]
+ * @param {string} [param.resultText]
+ * @param {HistoryMessage[]} [param.messages]
  * @returns {Promise<HistoryItem[]>}
  */
-export async function saveHistory({ mode, inputText, resultText }) {
-  if (!resultText) return [];
+export async function saveHistory({ id, mode, inputText, resultText, messages }) {
+  if (!resultText && (!messages || messages.length === 0)) return await getHistory();
 
+  const sessionId = id || Date.now().toString();
   const existing = await getHistory();
-  const newItem = {
-    id: Date.now().toString(),
+  const index = existing.findIndex((i) => i.id === sessionId);
+
+  const lastMessage = messages && messages.length > 0 ? messages[messages.length - 1].content : resultText;
+  const firstUserMsg = messages?.find((m) => m.role === "user")?.content || inputText || "";
+
+  const updatedItem = {
+    id: sessionId,
     timestamp: new Date().toISOString(),
     mode: mode || "explain",
-    inputText: inputText || "",
-    resultText,
+    inputText: firstUserMsg,
+    resultText: lastMessage || resultText || "",
+    messages: messages || [
+      ...(inputText ? [{ role: "user", content: inputText }] : []),
+      ...(resultText ? [{ role: "assistant", content: resultText }] : []),
+    ],
   };
 
-  const updated = [newItem, ...existing.filter((i) => i.resultText !== resultText)].slice(0, MAX_HISTORY);
+  let updatedList;
+  if (index !== -1) {
+    // Update existing session item and move to top
+    updatedList = [updatedItem, ...existing.filter((i) => i.id !== sessionId)];
+  } else {
+    // Create new session item
+    updatedList = [updatedItem, ...existing];
+  }
+
+  updatedList = updatedList.slice(0, MAX_HISTORY);
 
   try {
-    await store.set("items", updated);
+    await store.set("items", updatedList);
     await store.save();
   } catch (err) {
     console.warn("Failed to save history to store:", err);
   }
 
-  return updated;
+  return updatedList;
 }
 
 /**
