@@ -19,7 +19,7 @@
   marked.use(
     markedKatex({
       throwOnError: false,
-      nonStandard: true,
+      nonStandard: false,
     })
   );
 
