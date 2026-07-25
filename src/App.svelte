@@ -4,25 +4,17 @@
   import { slide } from "svelte/transition";
   import { listen } from "@tauri-apps/api/event";
   import {
-    checkNewCopy,
     syncClipboardBaseline,
     setLastProcessedText,
   } from "./services/clipboard.js";
-  import { askGroq } from "./services/groq.js";
-  import {
-    resizeToContent,
-    closePopup,
-    playPopIn,
-    resizeToHeight,
-  } from "./services/window.js";
+  import { resizeToContent, playPopIn } from "./services/window.js";
   import { setupWindowDrag } from "./services/drag.js";
-  import { saveTheme, loadTheme } from "./services/theme.js";
-  import {
-    getHistory,
-    saveHistory,
-    deleteHistoryItem,
-    clearHistory,
-  } from "./services/history.js";
+
+  // Svelte 5 Reactive Stores
+  import { chatStore } from "./stores/chat.svelte.js";
+  import { historyStore } from "./stores/historyStore.svelte.js";
+  import { themeStore } from "./stores/themeStore.svelte.js";
+  import { uiStore } from "./stores/uiState.svelte.js";
 
   // UI Components
   import PopupHeader from "./components/PopupHeader.svelte";
@@ -30,22 +22,6 @@
   import HistoryPanel from "./components/HistoryPanel.svelte";
   import PopupBody from "./components/PopupBody.svelte";
   import FollowUpInput from "./components/FollowUpInput.svelte";
-
-  // Component State
-  let status = $state("idle");
-  let chatMessages = $state([]);
-  let errorText = $state("");
-  let showThemePicker = $state(false);
-  let showHistory = $state(false);
-  let isMinimized = $state(false);
-  let savedFullHeight = $state(0); // stores window height before minimizing
-  let currentSessionId = $state(null); // stores active roomchat session ID
-  let activeMode = $state("explain"); // 'explain' | 'summary'
-  let currentText = $state("");
-  let historyItems = $state([]);
-  let currentThemeId = $state("midnight-purple");
-  let customColorHex = $state("#a855f7");
-  let isWindowVisible = $state(false);
 
   // DOM References
   let mainEl = $state(null);
@@ -62,30 +38,26 @@
   let unlistenMin = null;
 
   onMount(async () => {
-    const loaded = await loadTheme();
-    currentThemeId = loaded.themeId;
-    if (loaded.customColor) customColorHex = loaded.customColor;
-
-    historyItems = await getHistory();
+    await themeStore.initTheme();
+    await historyStore.initHistory();
 
     unlistenSnap = await listen("snap:triggered", handleSnap);
     unlistenTheme = await listen(
       "theme:changed",
-      (e) => e.payload && selectPresetTheme(e.payload),
+      (e) => e.payload && themeStore.selectPresetTheme(e.payload)
     );
     unlistenMin = await listen("window:toggle_minimize", handleToggleMinimize);
 
     // Native OS clipboard listener emitted by Rust background thread
-    // 100% event-driven: zero CPU & RAM overhead from JS setInterval polling
     unlistenClip = await listen("clipboard:changed", async (e) => {
-      if (!isWindowVisible) return;
+      if (!uiStore.isWindowVisible) return;
 
       const text = e.payload;
-      if (text && typeof text === "string" && status !== "loading") {
+      if (text && typeof text === "string" && chatStore.status !== "loading") {
         const trimmed = text.trim();
         if (trimmed && trimmed.length > 0) {
           setLastProcessedText(trimmed);
-          await doCapture(trimmed);
+          await chatStore.doCapture(trimmed, historyStore);
         }
       }
     });
@@ -103,84 +75,39 @@
     if (headerEl && cardEl) return setupWindowDrag(headerEl, cardEl);
   });
 
-  // Auto-resize window based on DOM height changes (instant for all except minimize toggle)
+  // Auto-resize window based on DOM height changes
   $effect(() => {
-    status;
-    chatMessages.length;
-    errorText;
-    showThemePicker;
-    showHistory;
+    chatStore.status;
+    chatStore.chatMessages.length;
+    chatStore.errorText;
+    uiStore.showThemePicker;
+    uiStore.showHistory;
     tick().then(() => resizeToContent(mainEl));
   });
 
   async function handleSnap() {
-    isWindowVisible = true;
-    // Sync current clipboard as baseline so text copied BEFORE opening Glance is NEVER processed
+    uiStore.isWindowVisible = true;
     await syncClipboardBaseline();
-
     await tick();
     if (cardEl) playPopIn(cardEl);
   }
 
-  function resetState() {
-    status = "idle";
-    chatMessages = [];
-    currentSessionId = null;
-    errorText = "";
-    showThemePicker = false;
-    showHistory = false;
-    isMinimized = false;
-    isWindowVisible = false;
+  function handleToggleMinimize() {
+    uiStore.toggleMinimize(
+      mainEl,
+      chatStore.status,
+      chatStore.chatMessages.length
+    );
   }
 
-  function handleNewChat() {
-    status = "idle";
-    chatMessages = [];
-    currentSessionId = null;
-    errorText = "";
-    showThemePicker = false;
-    showHistory = false;
-    isMinimized = false;
+  function handleClose() {
+    uiStore.handleClose(cardEl, () => chatStore.resetChatState());
   }
 
-  async function handleToggleMinimize() {
-    // Only allow minimize when there's content to show
-    if (status !== "result" && chatMessages.length === 0) return;
-
-    if (!isMinimized) {
-      // MINIMIZING: capture current height, then collapse
-      const rawHeight = Math.max(mainEl.scrollHeight, mainEl.offsetHeight) + 16;
-      savedFullHeight = Math.max(100, Math.min(rawHeight, 600));
-      isMinimized = true;
-      showThemePicker = false;
-      showHistory = false;
-      // Wait for slide-out animation (220ms) to finish, then shrink window
-      setTimeout(() => resizeToContent(mainEl), 240);
-    } else {
-      // EXPANDING: pre-size window to full height first so slide-in has room
-      if (savedFullHeight > 0) {
-        await resizeToHeight(savedFullHeight);
-      }
-      // Then reveal content — slide-in animation plays inside the already-sized window
-      isMinimized = false;
-    }
-  }
-
-  async function handleClose() {
-    isWindowVisible = false;
-    await closePopup(cardEl, resetState);
-  }
-
-  function selectPresetTheme(id) {
-    currentThemeId = id;
-    saveTheme(id);
-  }
-
-  function handleCustomColorInput(e) {
-    const color = e.target.value;
-    customColorHex = color;
-    currentThemeId = "custom";
-    saveTheme("custom", color);
+  function handleSelectHistoryItem(item) {
+    chatStore.loadFromHistory(item);
+    uiStore.showHistory = false;
+    uiStore.isMinimized = false;
   }
 
   function handleKeydown(e) {
@@ -191,110 +118,6 @@
       handleToggleMinimize();
     }
   }
-
-  function handleSelectMode(mode) {
-    if (activeMode === mode) return;
-    activeMode = mode;
-    // Mode tab switch only updates activeMode for the NEXT capture / follow-up.
-    // Preserves existing conversation responses without auto-triggering or reading clipboard.
-  }
-
-  async function doCapture(text) {
-    if (!text) return;
-    try {
-      currentText = text;
-
-      if (!currentSessionId || status === "idle" || chatMessages.length === 0) {
-        // Start a brand new session
-        currentSessionId = Date.now().toString();
-        status = "loading";
-        const res = await askGroq(text, [], activeMode);
-        chatMessages = [
-          { role: "user", content: text },
-          { role: "assistant", content: res },
-        ];
-        status = "result";
-
-        historyItems = await saveHistory({
-          id: currentSessionId,
-          mode: activeMode,
-          inputText: text,
-          resultText: res,
-          messages: chatMessages,
-        });
-      } else {
-        // Append to existing active roomchat session
-        const previousHistory = [...chatMessages];
-        chatMessages = [...chatMessages, { role: "user", content: text }];
-        status = "loading";
-
-        const res = await askGroq(text, previousHistory, activeMode);
-        chatMessages = [...chatMessages, { role: "assistant", content: res }];
-        status = "result";
-
-        historyItems = await saveHistory({
-          id: currentSessionId,
-          mode: activeMode,
-          inputText: text,
-          resultText: res,
-          messages: chatMessages,
-        });
-      }
-    } catch (err) {
-      console.error("Glance error:", err);
-      errorText = err?.message || "Failed to process. Please try again.";
-      status = "error";
-    }
-  }
-
-  async function handleFollowUp(prompt) {
-    if (chatMessages.length === 0) return;
-    try {
-      if (!currentSessionId) {
-        currentSessionId = Date.now().toString();
-      }
-      const previousHistory = [...chatMessages];
-      chatMessages = [...chatMessages, { role: "user", content: prompt }];
-      status = "loading";
-
-      const res = await askGroq(prompt, previousHistory, activeMode);
-      chatMessages = [...chatMessages, { role: "assistant", content: res }];
-      status = "result";
-
-      historyItems = await saveHistory({
-        id: currentSessionId,
-        mode: activeMode,
-        inputText: prompt,
-        resultText: res,
-        messages: chatMessages,
-      });
-    } catch (err) {
-      console.error("Follow-up error:", err);
-      errorText = err?.message || "Failed to process follow-up.";
-      status = "error";
-    }
-  }
-
-  async function handleSelectHistoryItem(item) {
-    currentSessionId = item.id;
-    activeMode = item.mode || "explain";
-    chatMessages =
-      item.messages && item.messages.length > 0
-        ? item.messages
-        : [{ role: "assistant", content: item.resultText }];
-    currentText = item.inputText || "";
-    status = "result";
-    showHistory = false;
-    isMinimized = false;
-  }
-
-  async function handleDeleteHistoryItem(id) {
-    historyItems = await deleteHistoryItem(id);
-  }
-
-  async function handleClearAllHistory() {
-    historyItems = await clearHistory();
-  }
 </script>
 
 <svelte:window onkeydown={handleKeydown} />
@@ -302,72 +125,67 @@
 <main bind:this={mainEl}>
   <div class="card" bind:this={cardEl}>
     <PopupHeader
-      {status}
-      {showThemePicker}
-      {showHistory}
-      {isMinimized}
-      {activeMode}
+      status={chatStore.status}
+      showThemePicker={uiStore.showThemePicker}
+      showHistory={uiStore.showHistory}
+      isMinimized={uiStore.isMinimized}
+      activeMode={chatStore.activeMode}
       bind:headerEl
-      onToggleTheme={() => {
-        showThemePicker = !showThemePicker;
-        if (showThemePicker) showHistory = false;
-      }}
-      onToggleHistory={() => {
-        showHistory = !showHistory;
-        if (showHistory) showThemePicker = false;
-      }}
+      onToggleTheme={() => uiStore.toggleTheme()}
+      onToggleHistory={() => uiStore.toggleHistory()}
       onToggleMinimize={handleToggleMinimize}
-      onNewChat={handleNewChat}
+      onNewChat={() => chatStore.resetChatState()}
       onClose={handleClose}
-      onSelectMode={handleSelectMode}
+      onSelectMode={(m) => chatStore.selectMode(m)}
     />
 
-    {#if !isMinimized}
+    {#if !uiStore.isMinimized}
       <div
         transition:slide={{ duration: 220, axis: "y" }}
         class="card-body-wrapper"
       >
-        {#if showThemePicker}
+        {#if uiStore.showThemePicker}
           <ThemePicker
-            {currentThemeId}
-            {customColorHex}
-            onSelectPreset={selectPresetTheme}
-            onCustomColorInput={handleCustomColorInput}
+            currentThemeId={themeStore.currentThemeId}
+            customColorHex={themeStore.customColorHex}
+            onSelectPreset={(id) => themeStore.selectPresetTheme(id)}
+            onCustomColorInput={(e) => themeStore.handleCustomColorInput(e)}
           />
         {/if}
 
-        {#if showHistory}
+        {#if uiStore.showHistory}
           <HistoryPanel
-            {historyItems}
+            historyItems={historyStore.historyItems}
             onSelectHistoryItem={handleSelectHistoryItem}
-            onDeleteHistoryItem={handleDeleteHistoryItem}
-            onClearAllHistory={handleClearAllHistory}
+            onDeleteHistoryItem={(id) => historyStore.deleteItem(id)}
+            onClearAllHistory={() => historyStore.clearAll()}
           />
         {:else}
           <PopupBody
-            {status}
-            messages={chatMessages}
-            {errorText}
-            {activeMode}
-            onSelectMode={handleSelectMode}
+            status={chatStore.status}
+            messages={chatStore.chatMessages}
+            errorText={chatStore.errorText}
+            activeMode={chatStore.activeMode}
+            onSelectMode={(m) => chatStore.selectMode(m)}
           />
 
-          {#if status === "result" || chatMessages.length > 0}
+          {#if chatStore.status === "result" || chatStore.chatMessages.length > 0}
             <FollowUpInput
-              disabled={status === "loading"}
-              onSubmitFollowUp={handleFollowUp}
+              disabled={chatStore.status === "loading"}
+              onSubmitFollowUp={(prompt) =>
+                chatStore.handleFollowUp(prompt, historyStore)}
             />
           {/if}
         {/if}
       </div>
     {/if}
 
-    {#if status === "result" || chatMessages.length > 0}
+    {#if chatStore.status === "result" || chatStore.chatMessages.length > 0}
       <button
         class="collapse-bar"
         onclick={handleToggleMinimize}
         data-no-drag
-        aria-label={isMinimized ? "Expand" : "Minimize"}
+        aria-label={uiStore.isMinimized ? "Expand" : "Minimize"}
       >
         <svg
           width="12"
@@ -378,13 +196,13 @@
           stroke-width="2.5"
           stroke-linecap="round"
         >
-          {#if isMinimized}
+          {#if uiStore.isMinimized}
             <path d="M5 12h14M12 5l7 7-7 7" />
           {:else}
             <path d="M5 12h14" />
           {/if}
         </svg>
-        <span>{isMinimized ? "Expand" : "Minimize"}</span>
+        <span>{uiStore.isMinimized ? "Expand" : "Minimize"}</span>
       </button>
     {/if}
   </div>
