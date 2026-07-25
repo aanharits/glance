@@ -36,20 +36,6 @@ export async function syncClipboardBaseline() {
 }
 
 /**
- * Checks if new text was copied to system clipboard while Glance is open.
- * Returns new text string if copied, or null if unchanged.
- * @returns {Promise<string|null>}
- */
-export async function checkNewCopy() {
-  const text = await safeReadClipboard();
-  if (text && text !== lastProcessedText) {
-    lastProcessedText = text;
-    return text;
-  }
-  return null;
-}
-
-/**
  * Manually sets last processed baseline text.
  * @param {string} text
  */
