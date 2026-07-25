@@ -7,9 +7,15 @@
   --text-primary: #f2f0f7;
   --text-secondary: #8d8c99;
   --default-accent: #a855f7;
-  --default-accent-soft: rgba(168, 85, 247, 0.14);
+  --default-accent-soft: rgba(168, 85, 247, 0.18);
+  --default-accent-bright: #c084fc;
+  --default-accent-light: #e9d5ff;
+  --default-user-bubble-text: #ffffff;
   --accent: var(--default-accent);
   --accent-soft: var(--default-accent-soft);
+  --accent-bright: var(--default-accent-bright);
+  --accent-light: var(--default-accent-light);
+  --user-bubble-text: var(--default-user-bubble-text);
   --theme-tint-bg: radial-gradient(ellipse 90% 60% at 50% -10%, rgba(168, 85, 247, 0.16) 0%, transparent 85%);
   --radius: 12px;
   --glass-blur: 24px;

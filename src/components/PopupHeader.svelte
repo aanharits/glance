@@ -5,6 +5,7 @@
    *   showHistory?: boolean,
    *   isMinimized?: boolean,
    *   activeMode?: 'explain' | 'summary',
+   *   hasActiveChat?: boolean,
    *   headerEl: HTMLElement | null,
    *   onToggleTheme: () => void,
    *   onToggleHistory: () => void,
@@ -19,6 +20,7 @@
     showHistory = false,
     isMinimized = false,
     activeMode = "explain",
+    hasActiveChat = false,
     headerEl = $bindable(null),
     onToggleTheme,
     onToggleHistory,
@@ -62,19 +64,19 @@
       cx="12"
       cy="12"
       r="9.5"
-      stroke="var(--accent)"
+      stroke="var(--accent-bright, var(--accent))"
       stroke-width="1.8"
-      opacity="0.55"
+      opacity="0.65"
     />
     <circle
       cx="12"
       cy="12"
       r="5.5"
-      stroke="var(--accent)"
+      stroke="var(--accent-bright, var(--accent))"
       stroke-width="1.8"
-      opacity="0.85"
+      opacity="0.9"
     />
-    <circle cx="12" cy="12" r="2.2" fill="var(--accent)" />
+    <circle cx="12" cy="12" r="2.2" fill="var(--accent-bright, var(--accent))" />
   </svg>
 
   <!-- Title & Mode Dropdown Wrapper -->
@@ -166,28 +168,30 @@
   <div class="header-spacer"></div>
 
   <div class="header-actions" class:hidden={isMinimized}>
-    <!-- New Chat Button -->
-    <button
-      class="icon-btn"
-      onclick={onNewChat}
-      aria-label="New Chat"
-      title="New Chat"
-      data-no-drag
-    >
-      <svg
-        width="14"
-        height="14"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+    {#if showHistory || showThemePicker || hasActiveChat || status === "loading" || status === "result"}
+      <!-- New Chat Button -->
+      <button
+        class="icon-btn"
+        onclick={onNewChat}
+        aria-label="New Chat"
+        title="New Chat"
+        data-no-drag
       >
-        <line x1="12" y1="5" x2="12" y2="19" />
-        <line x1="5" y1="12" x2="19" y2="12" />
-      </svg>
-    </button>
+        <svg
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <line x1="12" y1="5" x2="12" y2="19" />
+          <line x1="5" y1="12" x2="19" y2="12" />
+        </svg>
+      </button>
+    {/if}
 
     <!-- History Toggle Button -->
     <button
@@ -340,7 +344,7 @@
   .mode-name {
     font-size: 13px;
     font-weight: 600;
-    color: var(--accent);
+    color: var(--accent-bright, var(--accent));
   }
 
   .chevron-icon {

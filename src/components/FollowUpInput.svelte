@@ -92,7 +92,7 @@
     margin-left: 0;
     border-radius: 8px;
     background: var(--accent);
-    color: #ffffff;
+    color: var(--user-bubble-text, #ffffff);
     border: none;
     outline: none;
     -webkit-appearance: none;

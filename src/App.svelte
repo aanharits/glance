@@ -130,6 +130,7 @@
       showHistory={uiStore.showHistory}
       isMinimized={uiStore.isMinimized}
       activeMode={chatStore.activeMode}
+      hasActiveChat={chatStore.chatMessages.length > 0}
       bind:headerEl
       onToggleTheme={() => uiStore.toggleTheme()}
       onToggleHistory={() => uiStore.toggleHistory()}

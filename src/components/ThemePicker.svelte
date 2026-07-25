@@ -64,14 +64,15 @@
     display: flex;
     align-items: center;
     gap: 6px;
+    flex-wrap: wrap;
   }
 
   .swatch {
-    width: 16px;
-    height: 16px;
+    width: 15px;
+    height: 15px;
     border-radius: 50%;
     background: var(--swatch-color);
-    border: 2px solid transparent;
+    border: 1.5px solid rgba(255, 255, 255, 0.2);
     cursor: pointer;
     padding: 0;
     transition:
@@ -80,12 +81,13 @@
   }
 
   .swatch:hover {
-    transform: scale(1.15);
+    transform: scale(1.2);
   }
 
   .swatch.selected {
     border-color: var(--text-primary);
-    transform: scale(1.15);
+    box-shadow: 0 0 8px var(--swatch-color);
+    transform: scale(1.2);
   }
 
   .custom-picker {
