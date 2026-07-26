@@ -4,9 +4,9 @@
 
 # Glance
 
-**Understand any complex paragraph, weird code snippet, or error message with tiny window.**
+**Understand any complex paragraph, code snippet, error log, or whatever the hell else you don't understand with tiny popup window.**
 
-_Highlight obscure jargon, AI code, or error logs, press `Cmd+Shift+S`, copy, and get an instant ELI5 explanation or TL;DR summary right from your system tray._
+_Just hit `Cmd+Shift+S` > highlight something > copy > get an instant ELI5 explanation or TL;DR summary right from your menu bar._
 
 [![macOS](https://img.shields.io/badge/macOS-Supported-brightgreen?logo=apple)](https://apple.com)
 [![Windows](https://img.shields.io/badge/Windows-Coming_Soon-lightgrey?logo=windows)](#)
@@ -20,9 +20,7 @@ _Highlight obscure jargon, AI code, or error logs, press `Cmd+Shift+S`, copy, an
 
 ---
 
-### _"The best code explanation is the one you never had to leave your IDE or browser to read."_
-
-**Glance** is a hyper-lightweight native desktop tool built with **Tauri + Rust + Svelte**. It sits silently in your macOS menu bar until you hit `Cmd+Shift+S`. Once opened, simply copy (`Cmd+C`) any text on your screen, and Glance will instantly analyze it using ultra-fast LLMs (Groq / Llama 3.1) and pop up a crisp, clutter-free explanation or summary anchored under your menu bar icon.
+**Glance** is a hyper-lightweight native desktop quick explanation tool, built with **Tauri + Rust + Svelte**. It sits silently in your macOS menu bar until you hit `Cmd+Shift+S`. Once opened, simply copy (`Cmd+C`) any text on your screen, and Glance will instantly analyze it using ultra-fast LLMs (Groq / Llama 3.1) and pop up a crisp, clutter-free explanation or summary anchored under your menu bar icon.
 
 No context switching. No opening ChatGPT tabs. No $20/month subscription traps.
 
@@ -30,10 +28,10 @@ No context switching. No opening ChatGPT tabs. No $20/month subscription traps.
 
 ### What Glance is (and isn't)
 
-- **What it is**: A 1-second contextual brain. Open Glance, copy any confusing sentence, math formula, AI-generated code, or error log, get a clear ELI5 answer or TL;DR summary, ask follow-up questions, and keep working.
-- **What it isn't**: A 20-page essay generator or a heavy research suite.
+- **What it is**: A 1-second contextual brain on your desktop. Open Glance, copy any confusing sentence, online novel dialogue snippet, exam/homework question you don't get, math formula, code snippet, or compiler error log. and then get an instant ELI5 answer or TL;DR summary, ask follow-up questions, and keep moving.
+- **What it isn't**: An all-in-one heavy AI workspace. It does not parse full PDF/DOCX files, generate AI images or videos, or automatically scan your entire browser tab context (like Chrome's built-in Gemini sidebar).
 
-> _If you want a 10-paragraph thesis, open ChatGPT. If you want to understand 1 confusing paragraph or error in 2 seconds without breaking your flow, use Glance._
+> _If you want a 10-paragraph essay, AI image generator, full file reader, or something heavy. open your ChatGPT._
 
 ---
 
@@ -61,24 +59,14 @@ Glance is currently focused on delivering a native experience on **macOS**. Cros
 ## First-Time Launch (macOS Gatekeeper Note)
 
 > [!NOTE]
-> **Unverified Developer Notice**: Because Glance is an open-source tool without a $99/year Apple Developer Certificate, macOS Gatekeeper may show a warning saying *"Apple could not verify Glance is free of malware"*. This is standard for community-built open-source macOS software.
+> **Unverified Developer Notice**: Because Glance is an open-source tool without a $99/year Apple Developer Certificate, macOS Gatekeeper may show a warning saying _"Apple could not verify Glance is free of malware"_. This is standard for community-built open-source macOS software.
 
-### How to Bypass Gatekeeper (Choose Any 1 Method):
+### How to Bypass Gatekeeper (System Settings)
 
-- **Method 1: Right-Click Open (Recommended — 5 seconds)**
-  1. Move `Glance.app` (or extracted DMG) to your `/Applications` folder.
-  2. **Right-Click** (or `Ctrl + Click`) `Glance.app` and select **Open**.
-  3. Click **Open** in the dialog window. macOS will permanently save this approval.
-
-- **Method 2: System Settings**
-  1. Open **System Settings** -> **Privacy & Security**.
-  2. Scroll down to **Security** and click **"Open Anyway"** next to Glance.
-
-- **Method 3: Terminal Command**
-  Run this command in your terminal to remove the quarantine attribute:
-  ```bash
-  xattr -cr /Applications/Glance.app
-  ```
+1. Open **System Settings** -> **Privacy & Security**.
+2. Scroll down to **Security** section.
+3. Click **"Open Anyway"** next to Glance.
+4. Confirm by clicking **Open** in the dialog window. macOS will permanently save this approval.
 
 ---
 
@@ -86,7 +74,8 @@ Glance is currently focused on delivering a native experience on **macOS**. Cros
 
 Why waste mental bandwidth decoding dense text or complex code? **Glance** handles:
 
-- **Confusing Paragraphs & Unclear Context**: Highlight dense text, obscure prose, or ambiguous paragraphs to get an instant, clear explanation.
+- **Confusing Paragraphs & Online Novel Dialogues**: Highlight dense text, foreign online novel dialogue snippets, obscure prose, or ambiguous paragraphs to get an instant, clear explanation.
+- **Exam & Homework Questions**: Highlight tough exam questions, science problems, or study material you don't understand for instant step-by-step guidance.
 - **Code & Syntax Breakdown**: Highlight complex functions, minified code, regex patterns, or AI snippets to understand what they actually do.
 - **Error Logs & Stack Traces**: Highlight compiler errors, build failures, or stack traces for an instant root-cause explanation and fix.
 - **Math & Science Calculations**: Solves complex math equations step-by-step accurately with LaTeX rendering (`$...$` and `$$...$$`).
