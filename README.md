@@ -38,8 +38,9 @@ No context switching. No opening ChatGPT tabs. No $20/month subscription traps.
 ## Demo
 
 <div align="center">
-  <!-- Replace link with your uploaded MP4 video or GIF -->
-  <img src="docs/demo.gif" alt="Glance Demo" width="100%" />
+  <video src="https://github.com/user-attachments/assets/4e149ceb-9cfd-4a60-8e3c-54c800329e82" controls width="100%">
+    <source src="assets/glance-demo.mp4" type="video/mp4" />
+  </video>
 </div>
 
 ---
