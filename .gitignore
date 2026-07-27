@@ -10,3 +10,7 @@ docs/
 .env.local
 .env.*.local
 !.env.example
+
+# Media assets
+*.mp4
+
