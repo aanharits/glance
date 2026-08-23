@@ -1,6 +1,6 @@
 [package]
 name = "glance"
-version = "0.1.0"
+version = "0.1.2"
 description = "Desktop AI tool: capture layar/clipboard, tanya AI lewat global shortcut"
 edition = "2021"
 
