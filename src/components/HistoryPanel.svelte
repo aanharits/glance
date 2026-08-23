@@ -5,13 +5,21 @@
    *   onDeleteHistoryItem: (id: string) => void,
    *   onClearAllHistory: () => void
    * }} */
-  let { historyItems = [], onSelectHistoryItem, onDeleteHistoryItem, onClearAllHistory } = $props();
+  let {
+    historyItems = [],
+    onSelectHistoryItem,
+    onDeleteHistoryItem,
+    onClearAllHistory,
+  } = $props();
 
   function formatTime(isoStr) {
     if (!isoStr) return "";
     try {
       const date = new Date(isoStr);
-      return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+      return date.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
     } catch {
       return "";
     }
@@ -31,14 +39,18 @@
     const rawInput = item.inputText || "";
     const cleanInput = cleanMarkdown(rawInput);
     if (cleanInput.length > 0) {
-      return cleanInput.length > 48 ? cleanInput.substring(0, 48) + "..." : cleanInput;
+      return cleanInput.length > 48
+        ? cleanInput.substring(0, 48) + "..."
+        : cleanInput;
     }
 
     // Fallback to first line of AI response
     const rawResult = item.resultText || "";
     const cleanResult = cleanMarkdown(rawResult);
     if (cleanResult.length > 0) {
-      return cleanResult.length > 48 ? cleanResult.substring(0, 48) + "..." : cleanResult;
+      return cleanResult.length > 48
+        ? cleanResult.substring(0, 48) + "..."
+        : cleanResult;
     }
 
     return "Untitled Session";
@@ -48,7 +60,9 @@
     const rawResult = item.resultText || "";
     const cleanResult = cleanMarkdown(rawResult);
     if (cleanResult.length > 0) {
-      return cleanResult.length > 85 ? cleanResult.substring(0, 85) + "..." : cleanResult;
+      return cleanResult.length > 85
+        ? cleanResult.substring(0, 85) + "..."
+        : cleanResult;
     }
     return "";
   }
@@ -145,7 +159,9 @@
     cursor: pointer;
     padding: 2px 6px;
     border-radius: 4px;
-    transition: color 150ms, background 150ms;
+    transition:
+      color 150ms,
+      background 150ms;
   }
 
   .clear-btn:hover {
@@ -181,7 +197,9 @@
     padding: 8px 10px;
     border-radius: 8px;
     cursor: pointer;
-    transition: background 150ms ease, border-color 150ms ease;
+    transition:
+      background 150ms ease,
+      border-color 150ms ease;
     margin-bottom: 6px;
     background: var(--surface);
     border: 1px solid var(--border);
@@ -246,7 +264,9 @@
     border: none;
     cursor: pointer;
     opacity: 0;
-    transition: opacity 150ms, color 150ms;
+    transition:
+      opacity 150ms,
+      color 150ms;
   }
 
   .history-item:hover .delete-item-btn {
