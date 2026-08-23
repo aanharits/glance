@@ -20,7 +20,7 @@ _Just hit `Cmd+Shift+S` > highlight something > copy > get an instant ELI5 expla
 
 ---
 
-**Glance** is a hyper-lightweight native desktop quick explanation tool, built with **Tauri + Rust + Svelte**. It sits silently in your macOS menu bar until you hit `Cmd+Shift+S`. Once opened, simply copy (`Cmd+C`) any text on your screen, and Glance will instantly analyze it using ultra-fast LLMs (Groq / Llama 3.1) and pop up a crisp, clutter-free explanation or summary anchored under your menu bar icon.
+**Glance** is a hyper-lightweight native desktop quick explanation tool, built with **Tauri + Rust + Svelte**. It sits silently in your macOS menu bar until you hit `Cmd+Shift+S`. Once opened, simply copy (`Cmd+C`) any text on your screen, and Glance will instantly analyze it using ultra-fast LLMs (Groq / GPT-OSS 20B) and pop up a crisp, clutter-free explanation or summary anchored under your menu bar icon.
 
 No context switching. No opening ChatGPT tabs. No $20/month subscription traps.
 
@@ -168,7 +168,7 @@ Glance is built with proactive safeguards to keep system usage lightweight and e
                                ▼
  ┌───────────────────────────────────────────────────────────┐
  │                    Cloud AI Providers                     │
- │  • Groq (Llama 3.1 8B Instant Text Analysis)             │
+ │  • Groq (GPT-OSS 20B Text Analysis)                        │
  │  • Gemini 1.5 Flash (Vision & Screenshot OCR)             │
  └─────────────────────────────┬─────────────────────────────┘
 ```
@@ -179,7 +179,7 @@ Glance is built with proactive safeguards to keep system usage lightweight and e
 | **Backend Core**      | **Rust + Tauri v2** — Cross-platform system integration, macOS Private API vibrancy & tray anchor. |
 | **Typography & Math** | **Marked.js + KaTeX** — GitHub-flavored markdown parsing + LaTeX mathematical rendering.           |
 | **Local Storage**     | **`@tauri-apps/plugin-store`** — Single-file JSON session history (`history.json`).                |
-| **AI Inference**      | **Groq API** (Llama 3.1 8B) for ultra-fast text, **Google Gemini 1.5** for vision.                 |
+| **AI Inference**      | **Groq API** (GPT-OSS 20B) for ultra-fast text, **Google Gemini 1.5** for vision.                 |
 
 ---
 
